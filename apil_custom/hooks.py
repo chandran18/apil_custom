@@ -5,6 +5,55 @@ app_description = "Custom app for weight-based sales pricing (Actual Weight / Ca
 app_email = "admin@example.com"
 app_license = "mit"
 
+# Fixtures: ship the weight-pricing custom fields as part of this app
+# (exported via `bench --site f.com export-fixtures`) instead of leaving
+# them as bare database rows.
+fixtures = [
+	{
+		"doctype": "Custom Field",
+		"filters": [
+			[
+				"name", "in", [
+					"Item-custom_catalogue_weight",
+					"Customer-custom_weight_basis",
+					"Sales Order Item-custom_catalogue_weight",
+					"Sales Order Item-custom_actual_weight",
+					"Sales Order Item-custom_weight_used",
+					"Sales Order Item-custom_rate_per_kg",
+					"Sales Invoice Item-custom_catalogue_weight",
+					"Sales Invoice Item-custom_actual_weight",
+					"Sales Invoice Item-custom_weight_used",
+					"Sales Invoice Item-custom_rate_per_kg",
+					"Contact-is_billing_contact",
+					"Sales Order Item-custom_qty_in_pcs",
+					"Sales Invoice Item-custom_qty_in_pcs",
+					"Purchase Order Item-custom_qty_in_pcs",
+					"Purchase Invoice Item-custom_qty_in_pcs",
+					"Purchase Receipt Item-custom_qty_in_pcs",
+					"Stock Entry Detail-custom_qty_in_pcs",
+					"Item-custom_pc_category",
+					"Customer-discount_prices",
+					"Sales Order Item-custom_base_rate_per_kg",
+					"Sales Order Item-custom_discount_percent_applied",
+					"Sales Invoice Item-custom_base_rate_per_kg",
+					"Sales Invoice Item-custom_discount_percent_applied",
+				]
+			]
+		]
+	},
+	{
+		"doctype": "Property Setter",
+		"filters": [
+			[
+				"doc_type", "in", ["Sales Order Item", "Sales Invoice Item"]
+			],
+			[
+				"field_name", "in", ["rate", "custom_rate_per_kg", "custom_weight_used", "amount"]
+			]
+		]
+	}
+]
+
 # Apps
 # ------------------
 
@@ -43,7 +92,10 @@ app_license = "mit"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {
+	"Sales Order": "public/js/weight_pricing.js",
+	"Sales Invoice": "public/js/weight_pricing.js",
+}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -129,21 +181,28 @@ app_license = "mit"
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+	"Stock Entry": "apil_custom.overrides.stock_entry.CustomStockEntry",
+	"BOM": "apil_custom.overrides.bom.CustomBOM",
+}
 
 # Document Events
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+	"Sales Order": {
+		"validate": "apil_custom.weight_pricing.sales.set_weight_and_amount",
+	},
+	"Sales Invoice": {
+		"validate": "apil_custom.weight_pricing.sales.set_weight_and_amount",
+	},
+	"Extrusion Log": {
+		"validate": "apil_custom.extrusion_log.before_save",
+		"before_submit": "apil_custom.extrusion_log.before_submit",
+		"on_submit": "apil_custom.extrusion_log.on_submit",
+	},
+}
 
 # Scheduled Tasks
 # ---------------
