@@ -4,3 +4,4 @@
 
 [post_model_sync]
 # Patches added in this section will be executed after doctypes are migrated
+apil_custom.patches.v1_0.convert_custom_doctypes_to_app_doctypes

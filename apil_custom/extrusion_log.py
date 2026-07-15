@@ -153,3 +153,34 @@ def on_submit(doc, method=None):
 	se.insert(ignore_permissions=True)
 	se.submit()
 	frappe.db.set_value("Extrusion Log", doc.name, "stock_entry", se.name)
+
+
+@frappe.whitelist()
+def get_extrusion_rm_availability(item_code, warehouse):
+	"""Live stock check called from the Extrusion Log form (see
+	public/js/extrusion_log.js) as the die/warehouse are picked, so the
+	operator sees available billet stock before submitting.
+
+	Migrated from a database-stored Server Script (API type) of the same
+	name, kept here as a real whitelisted function instead.
+	"""
+	result = {"rm_item": None, "available_qty": 0, "bom": None}
+
+	if item_code:
+		bom_name = frappe.db.get_value(
+			"BOM", {"item": item_code, "is_active": 1, "is_default": 1, "docstatus": 1}, "name"
+		)
+		result["bom"] = bom_name
+		if bom_name:
+			bom_items = frappe.get_all(
+				"BOM Item", filters={"parent": bom_name}, fields=["item_code"], order_by="idx asc", limit_page_length=1
+			)
+			if bom_items:
+				result["rm_item"] = bom_items[0].item_code
+
+	if result["rm_item"] and warehouse:
+		result["available_qty"] = frappe.db.get_value(
+			"Bin", {"item_code": result["rm_item"], "warehouse": warehouse}, "actual_qty"
+		) or 0
+
+	return result

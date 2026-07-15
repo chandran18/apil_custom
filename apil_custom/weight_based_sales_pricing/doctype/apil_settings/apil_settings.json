@@ -1,0 +1,45 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-07-15 07:09:11.452679",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "default_rate_per_kg"
+ ],
+ "fields": [
+  {
+   "description": "Base/reference selling rate per Kg for weight-priced items, before any customer category discount is applied.",
+   "fieldname": "default_rate_per_kg",
+   "fieldtype": "Currency",
+   "label": "Default Rate per Kg"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-07-15 07:23:43.907069",
+ "modified_by": "Administrator",
+ "module": "Weight Based Sales Pricing",
+ "name": "APIL Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

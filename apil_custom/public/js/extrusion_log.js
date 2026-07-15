@@ -1,0 +1,145 @@
+// Live form calculations for Extrusion Log: Total Input, Die Running Time,
+// Rec%, Output/Hr, auto-managed scrap row, stock availability indicator,
+// and quick-nav buttons to the resulting Stock Entry / Stock Balance report.
+//
+// Migrated from a database-stored Client Script of the same name - identical
+// behaviour, just living in the app instead of the database.
+
+frappe.ui.form.on("Extrusion Log", {
+	refresh: function (frm) {
+		if (frm.doc.stock_entry) {
+			frm.add_custom_button("View Stock Entry", function () {
+				frappe.set_route("Form", "Stock Entry", frm.doc.stock_entry);
+			});
+		}
+		if (frm.doc.rm_item && frm.doc.source_warehouse) {
+			frm.add_custom_button("View Billet Stock Balance", function () {
+				frappe.route_options = { item_code: frm.doc.rm_item, warehouse: frm.doc.source_warehouse };
+				frappe.set_route("query-report", "Stock Balance");
+			});
+		}
+		show_stock_indicator(frm);
+	},
+	sec_no: function (frm) {
+		fetch_availability(frm);
+	},
+	source_warehouse: function (frm) {
+		fetch_availability(frm);
+	},
+	die_in: function (frm) {
+		calc_running_time(frm);
+	},
+	die_out: function (frm) {
+		calc_running_time(frm);
+	},
+	output: function (frm) {
+		calc_rec(frm);
+	},
+});
+
+frappe.ui.form.on("Extrusion Log Billet Charge", {
+	billet_weight: function (frm) {
+		calc_total_input(frm);
+	},
+	billet_charges_remove: function (frm) {
+		calc_total_input(frm);
+	},
+});
+
+function fetch_availability(frm) {
+	if (!frm.doc.sec_no) return;
+	frappe.call({
+		method: "apil_custom.extrusion_log.get_extrusion_rm_availability",
+		args: { item_code: frm.doc.sec_no, warehouse: frm.doc.source_warehouse },
+		callback: function (r) {
+			if (r.message) {
+				frm.set_value("rm_item", r.message.rm_item);
+				frm.set_value("available_stock", r.message.available_qty);
+				frm.set_value("bom", r.message.bom);
+				show_stock_indicator(frm);
+				frm.refresh();
+			}
+		},
+	});
+}
+
+function calc_total_input(frm) {
+	let total = 0;
+	(frm.doc.billet_charges || []).forEach(function (row) {
+		total += flt(row.billet_weight);
+	});
+	frm.set_value("total_input", total);
+	calc_rec(frm);
+	calc_scrap(frm);
+	show_stock_indicator(frm);
+}
+
+function calc_running_time(frm) {
+	if (frm.doc.die_in && frm.doc.die_out) {
+		let diff = moment.duration(frm.doc.die_out) - moment.duration(frm.doc.die_in);
+		if (diff < 0) diff += 24 * 3600 * 1000;
+		frm.set_value("die_running_time", diff / 1000);
+		calc_output_per_hr(frm);
+	}
+}
+
+function calc_rec(frm) {
+	if (frm.doc.output && frm.doc.total_input) {
+		frm.set_value("rec_percent", flt((frm.doc.output / frm.doc.total_input) * 100, 2));
+	}
+	calc_output_per_hr(frm);
+	calc_scrap(frm);
+}
+
+function calc_output_per_hr(frm) {
+	if (frm.doc.output && frm.doc.die_running_time) {
+		let hours = frm.doc.die_running_time / 3600;
+		if (hours > 0) frm.set_value("output_per_hr", flt(frm.doc.output / hours, 2));
+	}
+}
+
+function calc_scrap(frm) {
+	let auto_qty = flt(frm.doc.total_input) - flt(frm.doc.output);
+	auto_qty = auto_qty > 0 ? flt(auto_qty, 4) : 0;
+
+	// Remove any previously auto-generated row, keep manually added ones untouched.
+	frm.doc.scrap_items = (frm.doc.scrap_items || []).filter(function (r) {
+		return !r.auto_calculated;
+	});
+
+	if (auto_qty > 0) {
+		frm.add_child("scrap_items", {
+			scrap_item: "Al-Scrap",
+			qty: auto_qty,
+			warehouse: frm.doc.target_warehouse,
+			auto_calculated: 1,
+		});
+	}
+	refresh_field("scrap_items");
+
+	let total = 0;
+	(frm.doc.scrap_items || []).forEach(function (r) {
+		total += flt(r.qty);
+	});
+	frm.set_value("total_scrap_qty", total);
+}
+
+function show_stock_indicator(frm) {
+	frm.dashboard.clear_headline();
+	if (frm.doc.available_stock === undefined || frm.doc.available_stock === null) return;
+	let needed = flt(frm.doc.total_input);
+	let available = flt(frm.doc.available_stock);
+	if (!needed) return;
+	if (needed > available) {
+		frm.dashboard.set_headline_alert(
+			"Insufficient " + (frm.doc.rm_item || "billet") + " stock in " + frm.doc.source_warehouse +
+				": available " + available + " kg, this log needs " + needed + " kg. Please refill stock before submitting.",
+			"red"
+		);
+	} else {
+		frm.dashboard.set_headline_alert(
+			"Stock OK: " + available + " kg " + (frm.doc.rm_item || "billet") + " available (needs " + needed + " kg).",
+			"green"
+		);
+	}
+}

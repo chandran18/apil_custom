@@ -53,6 +53,11 @@ fixtures = [
 		]
 	}
 ]
+# Extrusion Log, Extrusion Log Billet Charge, Extrusion Log Scrap Item,
+# APIL Settings and Customer Discount Price are NOT fixtures - they are
+# native app doctypes (custom=0) with their own json + controller files
+# under weight_based_sales_pricing/doctype/, converted via the
+# convert_custom_doctypes_to_app_doctypes patch.
 
 # Apps
 # ------------------
@@ -95,6 +100,7 @@ fixtures = [
 doctype_js = {
 	"Sales Order": "public/js/weight_pricing.js",
 	"Sales Invoice": "public/js/weight_pricing.js",
+	"Extrusion Log": "public/js/extrusion_log.js",
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}

@@ -1,0 +1,325 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:EXL-{date}-{#####}",
+ "creation": "2026-07-15 07:09:11.101817",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "shift",
+  "column_break_1",
+  "die_no",
+  "sec_no",
+  "cavity",
+  "batch_no_ref",
+  "section_break_time",
+  "die_in",
+  "die_out",
+  "column_break_2",
+  "die_running_time",
+  "is_trial_run",
+  "section_break_billets",
+  "billet_charges",
+  "total_input",
+  "section_break_output",
+  "cut_length",
+  "ok_pcs",
+  "per_pc_weight",
+  "column_break_3",
+  "output",
+  "rec_percent",
+  "output_per_hr",
+  "remarks",
+  "section_break_stock",
+  "company",
+  "source_warehouse",
+  "column_break_4",
+  "target_warehouse",
+  "bom",
+  "stock_entry",
+  "amended_from",
+  "rm_item",
+  "available_stock",
+  "scrap_items",
+  "total_scrap_qty",
+  "gas_item",
+  "gas_consumed",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "shift",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Shift",
+   "options": "A\nB\nC"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "die_no",
+   "fieldtype": "Data",
+   "label": "Die No"
+  },
+  {
+   "fieldname": "sec_no",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Sec No (Item)",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "cavity",
+   "fieldtype": "Int",
+   "label": "Cavity"
+  },
+  {
+   "fieldname": "batch_no_ref",
+   "fieldtype": "Data",
+   "label": "Batch No"
+  },
+  {
+   "fieldname": "section_break_time",
+   "fieldtype": "Section Break",
+   "label": "Die Timing"
+  },
+  {
+   "fieldname": "die_in",
+   "fieldtype": "Time",
+   "label": "Die In"
+  },
+  {
+   "fieldname": "die_out",
+   "fieldtype": "Time",
+   "label": "Die Out"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "die_running_time",
+   "fieldtype": "Duration",
+   "label": "Die Running Time",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_trial_run",
+   "fieldtype": "Check",
+   "label": "Trial Run"
+  },
+  {
+   "fieldname": "section_break_billets",
+   "fieldtype": "Section Break",
+   "label": "Billet Charges"
+  },
+  {
+   "fieldname": "billet_charges",
+   "fieldtype": "Table",
+   "label": "Billet Charges",
+   "options": "Extrusion Log Billet Charge"
+  },
+  {
+   "fieldname": "total_input",
+   "fieldtype": "Float",
+   "label": "Total Input (Kg)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_output",
+   "fieldtype": "Section Break",
+   "label": "Output"
+  },
+  {
+   "default": "6.4M Length",
+   "fieldname": "cut_length",
+   "fieldtype": "Data",
+   "label": "C/L"
+  },
+  {
+   "fieldname": "ok_pcs",
+   "fieldtype": "Int",
+   "label": "OK Pcs",
+   "reqd": 1
+  },
+  {
+   "fieldname": "per_pc_weight",
+   "fieldtype": "Float",
+   "label": "Per Pc Weight (Kg)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "output",
+   "fieldtype": "Float",
+   "label": "Output (Kg)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "rec_percent",
+   "fieldtype": "Percent",
+   "label": "Rec %",
+   "read_only": 1
+  },
+  {
+   "fieldname": "output_per_hr",
+   "fieldtype": "Float",
+   "label": "Output/Hr (Kg)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "section_break_stock",
+   "fieldtype": "Section Break",
+   "label": "Stock Linkage"
+  },
+  {
+   "default": "ravi",
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "default": "Finished Goods - R",
+   "fieldname": "source_warehouse",
+   "fieldtype": "Link",
+   "label": "Billet Source Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Stores - R",
+   "fieldname": "target_warehouse",
+   "fieldtype": "Link",
+   "label": "Output Target Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "bom",
+   "fieldtype": "Link",
+   "label": "BOM",
+   "options": "BOM",
+   "read_only": 1
+  },
+  {
+   "fieldname": "stock_entry",
+   "fieldtype": "Link",
+   "label": "Stock Entry",
+   "options": "Stock Entry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Extrusion Log",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "rm_item",
+   "fieldtype": "Data",
+   "label": "RM Item (Billet)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "available_stock",
+   "fieldtype": "Float",
+   "label": "Available Billet Stock (Kg)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "scrap_items",
+   "fieldtype": "Table",
+   "label": "Scrap Items",
+   "options": "Extrusion Log Scrap Item"
+  },
+  {
+   "fieldname": "total_scrap_qty",
+   "fieldtype": "Float",
+   "label": "Total Scrap Qty (Kg)",
+   "read_only": 1
+  },
+  {
+   "default": "Industrial Gas",
+   "fieldname": "gas_item",
+   "fieldtype": "Link",
+   "label": "Gas Item",
+   "options": "Item"
+  },
+  {
+   "description": "LPG/industrial gas consumed by the billet heater for this die run.",
+   "fieldname": "gas_consumed",
+   "fieldtype": "Float",
+   "label": "Gas Consumed (Kg)"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Extrusion Log",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-07-15 07:23:43.361182",
+ "modified_by": "Administrator",
+ "module": "Weight Based Sales Pricing",
+ "name": "Extrusion Log",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "sec_no"
+}
