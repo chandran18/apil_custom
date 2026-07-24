@@ -1,6 +1,7 @@
 // Live form calculations for Extrusion Log: Total Input, Die Running Time,
-// Rec%, Output/Hr, auto-managed scrap row, stock availability indicator,
-// and quick-nav buttons to the resulting Stock Entry / Stock Balance report.
+// Rec%, Output/Hr, Total Scrap Qty (from manually entered Scrap Items),
+// stock availability indicator, and quick-nav buttons to the resulting
+// Stock Entry / Stock Balance report.
 //
 // Migrated from a database-stored Client Script of the same name - identical
 // behaviour, just living in the app instead of the database.
@@ -46,6 +47,15 @@ frappe.ui.form.on("Extrusion Log Billet Charge", {
 	},
 });
 
+frappe.ui.form.on("Extrusion Log Scrap Item", {
+	qty: function (frm) {
+		calc_total_scrap(frm);
+	},
+	scrap_items_remove: function (frm) {
+		calc_total_scrap(frm);
+	},
+});
+
 function fetch_availability(frm) {
 	if (!frm.doc.sec_no) return;
 	frappe.call({
@@ -70,7 +80,6 @@ function calc_total_input(frm) {
 	});
 	frm.set_value("total_input", total);
 	calc_rec(frm);
-	calc_scrap(frm);
 	show_stock_indicator(frm);
 }
 
@@ -88,7 +97,6 @@ function calc_rec(frm) {
 		frm.set_value("rec_percent", flt((frm.doc.output / frm.doc.total_input) * 100, 2));
 	}
 	calc_output_per_hr(frm);
-	calc_scrap(frm);
 }
 
 function calc_output_per_hr(frm) {
@@ -98,25 +106,8 @@ function calc_output_per_hr(frm) {
 	}
 }
 
-function calc_scrap(frm) {
-	let auto_qty = flt(frm.doc.total_input) - flt(frm.doc.output);
-	auto_qty = auto_qty > 0 ? flt(auto_qty, 4) : 0;
-
-	// Remove any previously auto-generated row, keep manually added ones untouched.
-	frm.doc.scrap_items = (frm.doc.scrap_items || []).filter(function (r) {
-		return !r.auto_calculated;
-	});
-
-	if (auto_qty > 0) {
-		frm.add_child("scrap_items", {
-			scrap_item: "Al-Scrap",
-			qty: auto_qty,
-			warehouse: frm.doc.target_warehouse,
-			auto_calculated: 1,
-		});
-	}
-	refresh_field("scrap_items");
-
+function calc_total_scrap(frm) {
+	// Scrap Items are entered manually by the operator - just total them.
 	let total = 0;
 	(frm.doc.scrap_items || []).forEach(function (r) {
 		total += flt(r.qty);

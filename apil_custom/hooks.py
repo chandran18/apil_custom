@@ -31,6 +31,7 @@ fixtures = [
 					"Purchase Invoice Item-custom_qty_in_pcs",
 					"Purchase Receipt Item-custom_qty_in_pcs",
 					"Stock Entry Detail-custom_qty_in_pcs",
+					"Stock Ledger Entry-custom_qty_in_pcs",
 					"Item-custom_pc_category",
 					"Customer-discount_prices",
 					"Sales Order Item-custom_base_rate_per_kg",
@@ -207,6 +208,9 @@ doc_events = {
 		"validate": "apil_custom.extrusion_log.before_save",
 		"before_submit": "apil_custom.extrusion_log.before_submit",
 		"on_submit": "apil_custom.extrusion_log.on_submit",
+	},
+	"Stock Ledger Entry": {
+		"validate": "apil_custom.overrides.stock_ledger.set_qty_in_pcs",
 	},
 }
 

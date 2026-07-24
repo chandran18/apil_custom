@@ -4,7 +4,8 @@ from frappe.utils import flt, time_diff_in_seconds
 
 def before_save(doc, method=None):
 	"""Live calculations: Total Input, Die Running Time, Rec%, Output/Hr,
-	auto-managed Al-Scrap row, and the linked BOM lookup.
+	and the linked BOM lookup. Scrap Items are entered manually by the
+	operator - this only totals whatever rows are present.
 
 	Moved here from a database-stored Server Script: identical logic, but
 	as a real app file it isn't subject to the RestrictedPython sandbox
@@ -38,31 +39,7 @@ def before_save(doc, method=None):
 	else:
 		doc.output_per_hr = 0
 
-	# Auto-manage a single Al-Scrap row (marked auto_calculated) inside the
-	# scrap_items child table, without touching any other rows the operator
-	# may have added manually for other scrap categories.
-	auto_scrap_qty = round(max((total_input or 0) - (doc.output or 0), 0), 4)
-	auto_row = None
-	for d in doc.scrap_items:
-		if d.auto_calculated:
-			auto_row = d
-			break
-
-	if auto_scrap_qty > 0:
-		if auto_row:
-			auto_row.scrap_item = auto_row.scrap_item or "Al-Scrap"
-			auto_row.qty = auto_scrap_qty
-			auto_row.warehouse = auto_row.warehouse or doc.target_warehouse
-		else:
-			doc.append("scrap_items", {
-				"scrap_item": "Al-Scrap",
-				"qty": auto_scrap_qty,
-				"warehouse": doc.target_warehouse,
-				"auto_calculated": 1,
-			})
-	elif auto_row:
-		doc.scrap_items = [d for d in doc.scrap_items if d != auto_row]
-
+	# Scrap Items are entered manually by the operator - just total them.
 	doc.total_scrap_qty = round(sum([(d.qty or 0) for d in doc.scrap_items]), 4)
 
 	if doc.sec_no:
@@ -94,7 +71,11 @@ def before_submit(doc, method=None):
 
 
 def on_submit(doc, method=None):
-	"""Auto-create and submit the matching Stock Entry (Manufacture)."""
+	"""Auto-create the matching Stock Entry (Manufacture) as a draft.
+
+	Left as a draft intentionally - someone reviews and submits it by hand.
+	Submitting the Extrusion Log does not depend on the Stock Entry's status.
+	"""
 	if not doc.bom:
 		frappe.throw("No active submitted BOM found for item {0}. Cannot create Stock Entry.".format(doc.sec_no))
 
@@ -136,6 +117,7 @@ def on_submit(doc, method=None):
 		"uom": "6.4M Length",
 		"t_warehouse": doc.target_warehouse,
 		"is_finished_item": 1,
+		"custom_qty_in_pcs": doc.ok_pcs,
 	})
 
 	for row in doc.scrap_items:
@@ -151,8 +133,14 @@ def on_submit(doc, method=None):
 			})
 
 	se.insert(ignore_permissions=True)
-	se.submit()
 	frappe.db.set_value("Extrusion Log", doc.name, "stock_entry", se.name)
+	frappe.msgprint(
+		"Stock Entry {0} created as a draft. Please review and submit it manually.".format(
+			frappe.utils.get_link_to_form("Stock Entry", se.name)
+		),
+		title="Draft Stock Entry Created",
+		indicator="blue",
+	)
 
 
 @frappe.whitelist()
