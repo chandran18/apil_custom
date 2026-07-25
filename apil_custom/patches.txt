@@ -5,3 +5,9 @@
 [post_model_sync]
 # Patches added in this section will be executed after doctypes are migrated
 apil_custom.patches.v1_0.convert_custom_doctypes_to_app_doctypes
+apil_custom.patches.v1_1.create_mobile_approver_role
+apil_custom.patches.v1_2.extend_mobile_approver_permissions
+apil_custom.patches.v1_3.extend_mobile_approver_report_deps
+apil_custom.patches.v1_4.extend_mobile_approver_report_deps_2
+apil_custom.patches.v1_5.extend_mobile_approver_report_deps_3
+apil_custom.patches.v1_6.grant_write_for_submit

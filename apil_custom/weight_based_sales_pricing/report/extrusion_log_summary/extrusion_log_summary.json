@@ -42,6 +42,9 @@
  "roles": [
   {
    "role": "System Manager"
+  },
+  {
+   "role": "APIL Mobile Approver"
   }
  ],
  "timeout": 0

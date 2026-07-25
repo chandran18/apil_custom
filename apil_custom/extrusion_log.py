@@ -1,6 +1,8 @@
 import frappe
 from frappe.utils import flt, time_diff_in_seconds
 
+from apil_custom.mobile_notifications import send_push_to_role
+
 
 def before_save(doc, method=None):
 	"""Live calculations: Total Input, Die Running Time, Rec%, Output/Hr,
@@ -134,6 +136,16 @@ def on_submit(doc, method=None):
 
 	se.insert(ignore_permissions=True)
 	frappe.db.set_value("Extrusion Log", doc.name, "stock_entry", se.name)
+
+	send_push_to_role(
+		"APIL Mobile Approver",
+		title="Stock Entry pending approval",
+		body="Stock Entry {0} (from Extrusion Log {1}, Die {2}) needs review.".format(
+			se.name, doc.name, doc.die_no
+		),
+		data={"doctype": "Stock Entry", "name": se.name},
+	)
+
 	frappe.msgprint(
 		"Stock Entry {0} created as a draft. Please review and submit it manually.".format(
 			frappe.utils.get_link_to_form("Stock Entry", se.name)

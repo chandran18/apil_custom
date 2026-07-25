@@ -52,8 +52,43 @@ fixtures = [
 				"field_name", "in", ["rate", "custom_rate_per_kg", "custom_weight_used", "amount"]
 			]
 		]
+	},
+	{
+		"doctype": "Role",
+		"filters": [
+			[
+				"name", "=", "APIL Mobile Approver"
+			]
+		]
+	},
+	{
+		"doctype": "Custom DocPerm",
+		"filters": [
+			[
+				"role", "=", "APIL Mobile Approver"
+			]
+		]
+	},
+	{
+		"doctype": "Custom Role",
+		"filters": [
+			[
+				"report", "in", [
+					"Accounts Payable",
+					"Purchase Register",
+					"Stock Balance",
+					"Profit and Loss Statement",
+					"General Ledger",
+				]
+			]
+		]
 	}
 ]
+# APIL Mobile Approver (Role + Custom DocPerm rows) is created by the
+# apil_custom.patches.v1_1.create_mobile_approver_role patch on migrate;
+# the fixture filters above just capture it for export/version control
+# afterwards (bench --site f.com export-fixtures), same as the Custom
+# Field/Property Setter fixtures above.
 # Extrusion Log, Extrusion Log Billet Charge, Extrusion Log Scrap Item,
 # APIL Settings and Customer Discount Price are NOT fixtures - they are
 # native app doctypes (custom=0) with their own json + controller files
@@ -200,9 +235,11 @@ override_doctype_class = {
 doc_events = {
 	"Sales Order": {
 		"validate": "apil_custom.weight_pricing.sales.set_weight_and_amount",
+		"after_insert": "apil_custom.mobile_notifications.notify_new_weight_priced_document",
 	},
 	"Sales Invoice": {
 		"validate": "apil_custom.weight_pricing.sales.set_weight_and_amount",
+		"after_insert": "apil_custom.mobile_notifications.notify_new_weight_priced_document",
 	},
 	"Extrusion Log": {
 		"validate": "apil_custom.extrusion_log.before_save",
