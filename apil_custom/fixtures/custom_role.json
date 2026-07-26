@@ -1,0 +1,183 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Custom Role",
+  "modified": "2026-07-24 20:49:43.173796",
+  "name": "u97evtrrl6",
+  "page": null,
+  "ref_doctype": "Purchase Invoice",
+  "report": "Accounts Payable",
+  "roles": [
+   {
+    "parent": "u97evtrrl6",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "APIL Mobile Approver"
+   },
+   {
+    "parent": "u97evtrrl6",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Accounts Manager"
+   },
+   {
+    "parent": "u97evtrrl6",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Accounts User"
+   },
+   {
+    "parent": "u97evtrrl6",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Auditor"
+   },
+   {
+    "parent": "u97evtrrl6",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Purchase User"
+   }
+  ]
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Custom Role",
+  "modified": "2026-07-24 20:49:43.179287",
+  "name": "u9739j8j7q",
+  "page": null,
+  "ref_doctype": "Purchase Invoice",
+  "report": "Purchase Register",
+  "roles": [
+   {
+    "parent": "u9739j8j7q",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "APIL Mobile Approver"
+   },
+   {
+    "parent": "u9739j8j7q",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Accounts Manager"
+   },
+   {
+    "parent": "u9739j8j7q",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Accounts User"
+   },
+   {
+    "parent": "u9739j8j7q",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Auditor"
+   },
+   {
+    "parent": "u9739j8j7q",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Purchase User"
+   }
+  ]
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Custom Role",
+  "modified": "2026-07-24 20:49:43.183369",
+  "name": "u97mjbv3b6",
+  "page": null,
+  "ref_doctype": "Stock Ledger Entry",
+  "report": "Stock Balance",
+  "roles": [
+   {
+    "parent": "u97mjbv3b6",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "APIL Mobile Approver"
+   },
+   {
+    "parent": "u97mjbv3b6",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Accounts Manager"
+   },
+   {
+    "parent": "u97mjbv3b6",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Stock User"
+   }
+  ]
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Custom Role",
+  "modified": "2026-07-24 20:49:43.186738",
+  "name": "u97l3lfq0m",
+  "page": null,
+  "ref_doctype": "GL Entry",
+  "report": "Profit and Loss Statement",
+  "roles": [
+   {
+    "parent": "u97l3lfq0m",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "APIL Mobile Approver"
+   },
+   {
+    "parent": "u97l3lfq0m",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Accounts Manager"
+   },
+   {
+    "parent": "u97l3lfq0m",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Accounts User"
+   },
+   {
+    "parent": "u97l3lfq0m",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Auditor"
+   }
+  ]
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Custom Role",
+  "modified": "2026-07-24 20:49:43.189932",
+  "name": "u977rovndd",
+  "page": null,
+  "ref_doctype": "GL Entry",
+  "report": "General Ledger",
+  "roles": [
+   {
+    "parent": "u977rovndd",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "APIL Mobile Approver"
+   },
+   {
+    "parent": "u977rovndd",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Accounts Manager"
+   },
+   {
+    "parent": "u977rovndd",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Accounts User"
+   },
+   {
+    "parent": "u977rovndd",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Auditor"
+   }
+  ]
+ }
+]

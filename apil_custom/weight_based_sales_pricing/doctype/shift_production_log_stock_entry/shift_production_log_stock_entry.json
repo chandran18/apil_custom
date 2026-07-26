@@ -1,0 +1,63 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "creation": "2026-07-26 08:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "reference",
+  "stock_entry",
+  "stock_entry_type",
+  "entry_status"
+ ],
+ "fields": [
+  {
+   "description": "What this Stock Entry covers - an item code, or \"Scrap\".",
+   "fieldname": "reference",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Covers",
+   "read_only": 1
+  },
+  {
+   "fieldname": "stock_entry",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Stock Entry",
+   "options": "Stock Entry",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "stock_entry.stock_entry_type",
+   "fieldname": "stock_entry_type",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Type",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "stock_entry.docstatus",
+   "fieldname": "entry_status",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Status (0=Draft 1=Submitted)",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-07-26 08:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Weight Based Sales Pricing",
+ "name": "Shift Production Log Stock Entry",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

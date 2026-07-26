@@ -1,0 +1,191 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:SPL-{date}-{shift}-{#####}",
+ "creation": "2026-07-26 07:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "shift",
+  "column_break_1",
+  "company",
+  "section_break_entries",
+  "entries",
+  "section_break_totals",
+  "total_input",
+  "total_output",
+  "column_break_2",
+  "total_ok_pcs",
+  "overall_rec_percent",
+  "section_break_scrap",
+  "scrap_item",
+  "scrap_warehouse",
+  "column_break_3",
+  "scrap_qty",
+  "section_break_stock",
+  "created_stock_entries",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "shift",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Shift",
+   "options": "\nA\nB\nC",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "ravi",
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_entries",
+   "fieldtype": "Section Break",
+   "label": "Die Runs"
+  },
+  {
+   "description": "Pick this shift's already-submitted Extrusion Logs (one row per Die run). Each row's details are pulled in automatically from the log.",
+   "fieldname": "entries",
+   "fieldtype": "Table",
+   "label": "Die Runs",
+   "options": "Shift Production Log Entry",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_totals",
+   "fieldtype": "Section Break",
+   "label": "Shift Totals"
+  },
+  {
+   "fieldname": "total_input",
+   "fieldtype": "Float",
+   "label": "Total Input (Kg)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_output",
+   "fieldtype": "Float",
+   "label": "Total Output (Kg)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_ok_pcs",
+   "fieldtype": "Int",
+   "label": "Total OK Pcs",
+   "read_only": 1
+  },
+  {
+   "fieldname": "overall_rec_percent",
+   "fieldtype": "Percent",
+   "label": "Overall Rec %",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_scrap",
+   "fieldtype": "Section Break",
+   "label": "Scrap (Shift Total)"
+  },
+  {
+   "default": "Al-Scrap",
+   "description": "One scrap figure for the whole shift, matching the paper Daily Production Report - not tracked per Die run.",
+   "fieldname": "scrap_item",
+   "fieldtype": "Link",
+   "label": "Scrap Item",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "scrap_warehouse",
+   "fieldtype": "Link",
+   "label": "Scrap Warehouse",
+   "options": "Warehouse",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "scrap_qty",
+   "fieldtype": "Float",
+   "label": "Scrap Qty (Kg)"
+  },
+  {
+   "fieldname": "section_break_stock",
+   "fieldtype": "Section Break",
+   "label": "Stock Linkage"
+  },
+  {
+   "description": "One Stock Entry per distinct item in this shift (Manufacture type, auto-costed), plus one Material Receipt for the shift's total scrap.",
+   "fieldname": "created_stock_entries",
+   "fieldtype": "Table",
+   "label": "Created Stock Entries",
+   "options": "Shift Production Log Stock Entry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Shift Production Log",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-07-26 07:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Weight Based Sales Pricing",
+ "name": "Shift Production Log",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "shift"
+}

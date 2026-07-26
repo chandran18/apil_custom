@@ -9,7 +9,6 @@ import frappe
 DOCTYPES = [
 	"Extrusion Log",
 	"Extrusion Log Billet Charge",
-	"Extrusion Log Scrap Item",
 	"APIL Settings",
 	"Customer Discount Price",
 ]

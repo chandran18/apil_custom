@@ -20,7 +20,7 @@ def get_columns():
 		{"label": "Total Input (Kg)", "fieldname": "total_input", "fieldtype": "Float", "width": 110},
 		{"label": "Output (Kg)", "fieldname": "output", "fieldtype": "Float", "width": 100},
 		{"label": "Rec %", "fieldname": "rec_percent", "fieldtype": "Percent", "width": 80},
-		{"label": "Total Scrap Qty (Kg)", "fieldname": "total_scrap_qty", "fieldtype": "Float", "width": 120},
+		{"label": "Shift Production Log", "fieldname": "included_in_shift_log", "fieldtype": "Link", "options": "Shift Production Log", "width": 150},
 		{"label": "Stock Entry", "fieldname": "stock_entry", "fieldtype": "Link", "options": "Stock Entry", "width": 130},
 		{"label": "Stock Entry Status", "fieldname": "stock_entry_status", "fieldtype": "Data", "width": 110},
 	]
@@ -51,7 +51,7 @@ def get_data(filters):
 		select
 			el.name, el.date, el.shift, el.die_no, el.sec_no, el.ok_pcs,
 			el.per_pc_weight, el.total_input, el.output, el.rec_percent,
-			el.total_scrap_qty, el.stock_entry, se.docstatus as se_docstatus
+			el.included_in_shift_log, el.stock_entry, se.docstatus as se_docstatus
 		from `tabExtrusion Log` el
 		left join `tabStock Entry` se on se.name = el.stock_entry
 		where {conditions}

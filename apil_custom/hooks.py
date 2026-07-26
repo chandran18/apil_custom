@@ -32,6 +32,10 @@ fixtures = [
 					"Purchase Receipt Item-custom_qty_in_pcs",
 					"Stock Entry Detail-custom_qty_in_pcs",
 					"Stock Ledger Entry-custom_qty_in_pcs",
+					"Stock Entry-custom_extrusion_shift",
+					"Stock Entry-custom_extrusion_consolidated",
+					"Stock Entry Detail-custom_auto_consolidated",
+					"Stock Entry Detail-custom_extrusion_is_scrap",
 					"Item-custom_pc_category",
 					"Customer-discount_prices",
 					"Sales Order Item-custom_base_rate_per_kg",
@@ -89,10 +93,11 @@ fixtures = [
 # the fixture filters above just capture it for export/version control
 # afterwards (bench --site f.com export-fixtures), same as the Custom
 # Field/Property Setter fixtures above.
-# Extrusion Log, Extrusion Log Billet Charge, Extrusion Log Scrap Item,
-# APIL Settings and Customer Discount Price are NOT fixtures - they are
-# native app doctypes (custom=0) with their own json + controller files
-# under weight_based_sales_pricing/doctype/, converted via the
+# Extrusion Log, Extrusion Log Billet Charge, Shift Production Log,
+# Shift Production Log Entry, APIL Settings and Customer Discount Price
+# are NOT fixtures - they are native app doctypes (custom=0) with their
+# own json + controller files under weight_based_sales_pricing/doctype/,
+# converted via the
 # convert_custom_doctypes_to_app_doctypes patch.
 
 # Apps
@@ -137,6 +142,10 @@ doctype_js = {
 	"Sales Order": "public/js/weight_pricing.js",
 	"Sales Invoice": "public/js/weight_pricing.js",
 	"Extrusion Log": "public/js/extrusion_log.js",
+	"Shift Production Log": "public/js/shift_production_log.js",
+}
+doctype_list_js = {
+	"Extrusion Log": "public/js/extrusion_log_list.js",
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -244,7 +253,11 @@ doc_events = {
 	"Extrusion Log": {
 		"validate": "apil_custom.extrusion_log.before_save",
 		"before_submit": "apil_custom.extrusion_log.before_submit",
-		"on_submit": "apil_custom.extrusion_log.on_submit",
+	},
+	"Shift Production Log": {
+		"validate": "apil_custom.shift_production_log.before_save",
+		"before_submit": "apil_custom.shift_production_log.before_submit",
+		"on_submit": "apil_custom.shift_production_log.on_submit",
 	},
 	"Stock Ledger Entry": {
 		"validate": "apil_custom.overrides.stock_ledger.set_qty_in_pcs",

@@ -1,7 +1,6 @@
 // Live form calculations for Extrusion Log: Total Input, Die Running Time,
-// Rec%, Output/Hr, Total Scrap Qty (from manually entered Scrap Items),
-// stock availability indicator, and quick-nav buttons to the resulting
-// Stock Entry / Stock Balance report.
+// Rec%, Output/Hr, stock availability indicator, and quick-nav buttons to
+// the resulting Stock Entry / Stock Balance report.
 //
 // Migrated from a database-stored Client Script of the same name - identical
 // behaviour, just living in the app instead of the database.
@@ -11,6 +10,11 @@ frappe.ui.form.on("Extrusion Log", {
 		if (frm.doc.stock_entry) {
 			frm.add_custom_button("View Stock Entry", function () {
 				frappe.set_route("Form", "Stock Entry", frm.doc.stock_entry);
+			});
+		}
+		if (frm.doc.included_in_shift_log) {
+			frm.add_custom_button("View Shift Production Log", function () {
+				frappe.set_route("Form", "Shift Production Log", frm.doc.included_in_shift_log);
 			});
 		}
 		if (frm.doc.rm_item && frm.doc.source_warehouse) {
@@ -44,15 +48,6 @@ frappe.ui.form.on("Extrusion Log Billet Charge", {
 	},
 	billet_charges_remove: function (frm) {
 		calc_total_input(frm);
-	},
-});
-
-frappe.ui.form.on("Extrusion Log Scrap Item", {
-	qty: function (frm) {
-		calc_total_scrap(frm);
-	},
-	scrap_items_remove: function (frm) {
-		calc_total_scrap(frm);
 	},
 });
 
@@ -104,15 +99,6 @@ function calc_output_per_hr(frm) {
 		let hours = frm.doc.die_running_time / 3600;
 		if (hours > 0) frm.set_value("output_per_hr", flt(frm.doc.output / hours, 2));
 	}
-}
-
-function calc_total_scrap(frm) {
-	// Scrap Items are entered manually by the operator - just total them.
-	let total = 0;
-	(frm.doc.scrap_items || []).forEach(function (r) {
-		total += flt(r.qty);
-	});
-	frm.set_value("total_scrap_qty", total);
 }
 
 function show_stock_indicator(frm) {

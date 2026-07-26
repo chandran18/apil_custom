@@ -39,11 +39,10 @@
   "target_warehouse",
   "bom",
   "stock_entry",
+  "included_in_shift_log",
   "amended_from",
   "rm_item",
   "available_stock",
-  "scrap_items",
-  "total_scrap_qty",
   "gas_item",
   "gas_consumed",
   "amended_from"
@@ -234,6 +233,15 @@
    "read_only": 1
   },
   {
+   "description": "Set once a Shift Production Log has pulled this log in as one of its rows - prevents the same Die run being counted in two different shift consolidations.",
+   "fieldname": "included_in_shift_log",
+   "fieldtype": "Link",
+   "label": "Included In Shift Production Log",
+   "no_copy": 1,
+   "options": "Shift Production Log",
+   "read_only": 1
+  },
+  {
    "fieldname": "amended_from",
    "fieldtype": "Link",
    "label": "Amended From",
@@ -252,18 +260,6 @@
    "fieldname": "available_stock",
    "fieldtype": "Float",
    "label": "Available Billet Stock (Kg)",
-   "read_only": 1
-  },
-  {
-   "fieldname": "scrap_items",
-   "fieldtype": "Table",
-   "label": "Scrap Items",
-   "options": "Extrusion Log Scrap Item"
-  },
-  {
-   "fieldname": "total_scrap_qty",
-   "fieldtype": "Float",
-   "label": "Total Scrap Qty (Kg)",
    "read_only": 1
   },
   {

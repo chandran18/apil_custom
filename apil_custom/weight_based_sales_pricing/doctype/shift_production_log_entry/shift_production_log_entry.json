@@ -1,0 +1,114 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "creation": "2026-07-26 07:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "extrusion_log",
+  "die_no",
+  "sec_no",
+  "cavity",
+  "batch_no_ref",
+  "total_input",
+  "ok_pcs",
+  "output",
+  "rec_percent",
+  "remarks"
+ ],
+ "fields": [
+  {
+   "fieldname": "extrusion_log",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Extrusion Log",
+   "options": "Extrusion Log",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "extrusion_log.die_no",
+   "fieldname": "die_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Die No",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "extrusion_log.sec_no",
+   "fieldname": "sec_no",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Sec No (Item)",
+   "options": "Item",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "extrusion_log.cavity",
+   "fieldname": "cavity",
+   "fieldtype": "Int",
+   "label": "Cavity",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "extrusion_log.batch_no_ref",
+   "fieldname": "batch_no_ref",
+   "fieldtype": "Data",
+   "label": "Batch No",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "extrusion_log.total_input",
+   "fieldname": "total_input",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Total Input (Kg)",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "extrusion_log.ok_pcs",
+   "fieldname": "ok_pcs",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "OK Pcs",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "extrusion_log.output",
+   "fieldname": "output",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Output (Kg)",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "extrusion_log.rec_percent",
+   "fieldname": "rec_percent",
+   "fieldtype": "Percent",
+   "label": "Rec %",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "extrusion_log.remarks",
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-07-26 07:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Weight Based Sales Pricing",
+ "name": "Shift Production Log Entry",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
