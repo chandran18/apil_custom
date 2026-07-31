@@ -2,6 +2,187 @@
  {
   "docstatus": 0,
   "doctype": "Custom Role",
+  "modified": "2026-07-25 21:01:27.722473",
+  "name": "gtddle2n0a",
+  "page": null,
+  "ref_doctype": "Purchase Invoice",
+  "report": "Accounts Payable",
+  "roles": [
+   {
+    "parent": "gtddle2n0a",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "APIL Mobile Approver"
+   },
+   {
+    "parent": "gtddle2n0a",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Accounts Manager"
+   },
+   {
+    "parent": "gtddle2n0a",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Accounts User"
+   },
+   {
+    "parent": "gtddle2n0a",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Auditor"
+   },
+   {
+    "parent": "gtddle2n0a",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Purchase User"
+   }
+  ]
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Custom Role",
+  "modified": "2026-07-25 21:01:27.744081",
+  "name": "gtdd07cken",
+  "page": null,
+  "ref_doctype": "Purchase Invoice",
+  "report": "Purchase Register",
+  "roles": [
+   {
+    "parent": "gtdd07cken",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "APIL Mobile Approver"
+   },
+   {
+    "parent": "gtdd07cken",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Accounts Manager"
+   },
+   {
+    "parent": "gtdd07cken",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Accounts User"
+   },
+   {
+    "parent": "gtdd07cken",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Auditor"
+   },
+   {
+    "parent": "gtdd07cken",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Purchase User"
+   }
+  ]
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Custom Role",
+  "modified": "2026-07-25 21:01:27.766637",
+  "name": "gtdbijth9o",
+  "page": null,
+  "ref_doctype": "Stock Ledger Entry",
+  "report": "Stock Balance",
+  "roles": [
+   {
+    "parent": "gtdbijth9o",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "APIL Mobile Approver"
+   },
+   {
+    "parent": "gtdbijth9o",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Accounts Manager"
+   },
+   {
+    "parent": "gtdbijth9o",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Stock User"
+   }
+  ]
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Custom Role",
+  "modified": "2026-07-25 21:01:27.788500",
+  "name": "gtd3oi7spj",
+  "page": null,
+  "ref_doctype": "GL Entry",
+  "report": "Profit and Loss Statement",
+  "roles": [
+   {
+    "parent": "gtd3oi7spj",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "APIL Mobile Approver"
+   },
+   {
+    "parent": "gtd3oi7spj",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Accounts Manager"
+   },
+   {
+    "parent": "gtd3oi7spj",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Accounts User"
+   },
+   {
+    "parent": "gtd3oi7spj",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Auditor"
+   }
+  ]
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Custom Role",
+  "modified": "2026-07-25 21:01:27.801139",
+  "name": "gtd4lrgbue",
+  "page": null,
+  "ref_doctype": "GL Entry",
+  "report": "General Ledger",
+  "roles": [
+   {
+    "parent": "gtd4lrgbue",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "APIL Mobile Approver"
+   },
+   {
+    "parent": "gtd4lrgbue",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Accounts Manager"
+   },
+   {
+    "parent": "gtd4lrgbue",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Accounts User"
+   },
+   {
+    "parent": "gtd4lrgbue",
+    "parentfield": "roles",
+    "parenttype": "Custom Role",
+    "role": "Auditor"
+   }
+  ]
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Custom Role",
   "modified": "2026-07-24 20:49:43.173796",
   "name": "u97evtrrl6",
   "page": null,
