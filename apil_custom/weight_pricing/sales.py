@@ -83,7 +83,20 @@ def set_weight_and_amount(doc, method=None):
 
 	Qty is left untouched (stock/delivery still tracks pieces correctly);
 	only Rate (and the Amount/totals derived from it) changes.
+
+	Sales Invoice only: gated behind APIL Settings.enable_weight_based_pricing
+	so sites/clients that don't want weight-based invoicing get plain ERPNext
+	Qty x Rate behaviour. Sales Order is intentionally NOT gated here - it
+	always applies weight-based pricing - since Sales Invoice is commonly
+	pulled in from Sales Order line items, and disabling only one of the two
+	would leave the Sales Order's adjusted rate silently overwritten (or not)
+	inconsistently when invoiced.
 	"""
+	if doc.doctype == "Sales Invoice" and not frappe.db.get_single_value(
+		"APIL Settings", "enable_weight_based_pricing"
+	):
+		return
+
 	changed = False
 	for item in doc.items:
 		result = _compute_weight_pricing(

@@ -6,7 +6,8 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "default_rate_per_kg"
+  "default_rate_per_kg",
+  "enable_weight_based_pricing"
  ],
  "fields": [
   {
@@ -14,6 +15,13 @@
    "fieldname": "default_rate_per_kg",
    "fieldtype": "Currency",
    "label": "Default Rate per Kg"
+  },
+  {
+   "default": "0",
+   "description": "Currently gates Sales Invoice only. When unchecked, Sales Invoice uses standard ERPNext Qty × Rate billing untouched. Sales Order always applies weight-based pricing regardless of this setting.",
+   "fieldname": "enable_weight_based_pricing",
+   "fieldtype": "Check",
+   "label": "Enable Weight-Based Pricing (Sales Invoice)"
   }
  ],
  "grid_page_length": 50,
