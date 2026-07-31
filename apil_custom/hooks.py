@@ -86,48 +86,20 @@ fixtures = [
 			]
 		]
 	},
-	{
-		"doctype": "Role",
-		"filters": [
-			[
-				"name", "=", "APIL Mobile Approver"
-			]
-		]
-	},
-	{
-		"doctype": "Custom DocPerm",
-		"filters": [
-			[
-				"role", "=", "APIL Mobile Approver"
-			]
-		]
-	},
-	{
-		"doctype": "Custom Role",
-		"filters": [
-			[
-				"report", "in", [
-					"Accounts Payable",
-					"Purchase Register",
-					"Stock Balance",
-					"Profit and Loss Statement",
-					"General Ledger",
-				]
-			]
-		]
-	}
 ]
-# APIL Mobile Approver (Role + Custom DocPerm rows) is created by the
-# apil_custom.patches.v1_1.create_mobile_approver_role patch on migrate;
-# the fixture filters above just capture it for export/version control
-# afterwards (bench --site f.com export-fixtures), same as the Custom
-# Field/Property Setter fixtures above.
 # Extrusion Log, Extrusion Log Billet Charge, Shift Production Log,
 # Shift Production Log Entry, APIL Settings and Customer Discount Price
 # are NOT fixtures - they are native app doctypes (custom=0) with their
 # own json + controller files under weight_based_sales_pricing/doctype/,
 # converted via the
 # convert_custom_doctypes_to_app_doctypes patch.
+#
+# The APIL Mobile Approver role, its Custom DocPerm rows, and the mobile
+# device/notification/approval code have all moved to the separate
+# apil_mobile app (which depends on this one) - see that app's hooks.py.
+# The v1_1/v1_2/v1_3/v1_4/v1_5 mobile-approver patches under patches/ stay
+# here as historical migration history for sites that already ran them;
+# they are not re-run and nothing new depends on them.
 
 # Apps
 # ------------------
@@ -273,11 +245,9 @@ override_doctype_class = {
 doc_events = {
 	"Sales Order": {
 		"validate": "apil_custom.weight_pricing.sales.set_weight_and_amount",
-		"after_insert": "apil_custom.mobile_notifications.notify_new_weight_priced_document",
 	},
 	"Sales Invoice": {
 		"validate": "apil_custom.weight_pricing.sales.set_weight_and_amount",
-		"after_insert": "apil_custom.mobile_notifications.notify_new_weight_priced_document",
 	},
 	"Extrusion Log": {
 		"validate": "apil_custom.extrusion_log.before_save",
