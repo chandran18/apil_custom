@@ -1,11 +1,30 @@
 import frappe
 from frappe.utils import cint, flt, getdate
 
-from apil_custom.mobile_notifications import send_push_to_role
-
 ENTRY_FETCH_FIELDS = [
 	"die_no", "sec_no", "cavity", "batch_no_ref", "total_input", "ok_pcs", "output", "rec_percent", "remarks",
 ]
+
+
+def _notify_pending_approval(doc, created_count):
+	"""Push a mobile notification if the optional apil_mobile app is
+	installed; a no-op otherwise. apil_custom must work standalone (mobile
+	approval is a separate, optional layer some sites don't install), so
+	this can never be a hard import - the notification is a nice-to-have,
+	never something that should block a shift's Stock Entries from being
+	created.
+	"""
+	if "apil_mobile" not in frappe.get_installed_apps():
+		return
+
+	from apil_mobile.mobile_notifications import send_push_to_role
+
+	send_push_to_role(
+		"APIL Mobile Approver",
+		title="Stock Entries pending approval",
+		body="{0} Stock Entry(s) for Shift {1} ({2}) need review.".format(created_count, doc.shift, doc.date),
+		data={"doctype": "Shift Production Log", "name": doc.name},
+	)
 
 
 def before_save(doc, method=None):
@@ -135,12 +154,7 @@ def on_submit(doc, method=None):
 		doc.append("created_stock_entries", {"reference": reference, "stock_entry": se.name})
 	doc.db_update_all()
 
-	send_push_to_role(
-		"APIL Mobile Approver",
-		title="Stock Entries pending approval",
-		body="{0} Stock Entry(s) for Shift {1} ({2}) need review.".format(len(created), doc.shift, doc.date),
-		data={"doctype": "Shift Production Log", "name": doc.name},
-	)
+	_notify_pending_approval(doc, len(created))
 
 	frappe.msgprint(
 		"Created {0} draft Stock Entry(s) for this shift - one per item, each including its equal share "
