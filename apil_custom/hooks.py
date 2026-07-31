@@ -58,6 +58,35 @@ fixtures = [
 		]
 	},
 	{
+		# The 4 custom letterhead-style print formats (Quotation, Sales Order,
+		# Delivery Note, Sales Invoice) built for Alu Products Industries Ltd,
+		# plus the default_print_format Property Setters that make each one
+		# the default when printing. Without this, both live only as bare
+		# database rows and would be lost on a restore from an older backup.
+		"doctype": "Print Format",
+		"filters": [
+			[
+				"name", "in", [
+					"APIL Sales Quotation",
+					"APIL Sales Order",
+					"APIL Delivery Note",
+					"APIL Sales Invoice",
+				]
+			]
+		]
+	},
+	{
+		"doctype": "Property Setter",
+		"filters": [
+			[
+				"doc_type", "in", ["Quotation", "Sales Order", "Delivery Note", "Sales Invoice"]
+			],
+			[
+				"property", "=", "default_print_format"
+			]
+		]
+	},
+	{
 		"doctype": "Role",
 		"filters": [
 			[

@@ -116,6 +116,12 @@ def set_weight_and_amount(doc, method=None):
 
 	if changed:
 		doc.calculate_taxes_and_totals()
+		# ERPNext's own validate() already called set_total_in_words() earlier in this
+		# same validate cycle (accounts_controller.py), using the pre-adjustment rate/
+		# grand_total. calculate_taxes_and_totals() alone does not re-run it, so without
+		# this call "Amount in Words" is left stale and mismatched against grand_total
+		# on every weight-priced document.
+		doc.set_total_in_words()
 
 
 @frappe.whitelist()
