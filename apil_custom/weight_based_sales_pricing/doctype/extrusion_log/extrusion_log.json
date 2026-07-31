@@ -145,9 +145,12 @@
   },
   {
    "default": "6.4M Length",
+   "description": "The actual length this Die run was cut to. Standard is 6.4M Length; for a special-order length, pick the item's matching alternate UOM here instead (set up under the Item's UOM table) - this becomes the UOM on the finished-item row of the Stock Entry, so special-length output is never mislabeled as standard 6.4m.",
    "fieldname": "cut_length",
-   "fieldtype": "Data",
-   "label": "C/L"
+   "fieldtype": "Link",
+   "label": "C/L",
+   "options": "UOM",
+   "reqd": 1
   },
   {
    "fieldname": "ok_pcs",

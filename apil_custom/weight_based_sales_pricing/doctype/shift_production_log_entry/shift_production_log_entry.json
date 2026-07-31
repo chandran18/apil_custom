@@ -11,6 +11,7 @@
   "sec_no",
   "cavity",
   "batch_no_ref",
+  "cut_length",
   "total_input",
   "ok_pcs",
   "output",
@@ -55,6 +56,15 @@
    "fieldname": "batch_no_ref",
    "fieldtype": "Data",
    "label": "Batch No",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "extrusion_log.cut_length",
+   "fieldname": "cut_length",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "C/L",
+   "options": "UOM",
    "read_only": 1
   },
   {

@@ -2,7 +2,7 @@ import frappe
 from frappe.utils import cint, flt, getdate
 
 ENTRY_FETCH_FIELDS = [
-	"die_no", "sec_no", "cavity", "batch_no_ref", "total_input", "ok_pcs", "output", "rec_percent", "remarks",
+	"die_no", "sec_no", "cavity", "batch_no_ref", "cut_length", "total_input", "ok_pcs", "output", "rec_percent", "remarks",
 ]
 
 
@@ -105,44 +105,48 @@ def before_submit(doc, method=None):
 
 
 def on_submit(doc, method=None):
-	"""Create one Stock Entry per distinct item run this shift (Manufacture
-	type - correctly auto-costed from each item's BOM, one finished item
-	each, no scrap-flag quirk). The shift's single Scrap figure is split
-	across the item Stock Entries in proportion to each item's Total Input
-	(raw material consumed) and added as a row on each.
+	"""Create one Stock Entry per distinct (item, cut length) run this shift
+	(Manufacture type - correctly auto-costed from each item's BOM, one
+	finished item each, no scrap-flag quirk). Grouped by item AND length,
+	not item alone: a special-length order (e.g. 5.5M instead of the
+	standard 6.4M) is a different UOM/quantity on the finished-item row, so
+	it needs its own row rather than being summed in with standard-length
+	pieces of the same item. The shift's single Scrap figure is split
+	across all the created Stock Entries in proportion to each one's Total
+	Input (raw material consumed) and added as a row on each.
 
 	Not an equal split: a flat equal share breaks the moment run sizes vary
 	a lot in the same shift (e.g. a handful of small trial runs alongside
 	full production runs) - a trial run's tiny raw-material cost can be
 	less than its flat equal share of scrap value, driving the finished
 	item's auto-costed rate negative, which ERPNext rejects outright.
-	Proportional-by-input keeps every item's scrap share bounded by what it
-	actually consumed, so this can't happen, and it's more intuitively fair
-	besides: an item that used more material this shift absorbs more of
-	the shift's scrap.
+	Proportional-by-input keeps every share bounded by what was actually
+	consumed, so this can't happen, and it's more intuitively fair besides:
+	a run that used more material this shift absorbs more of the scrap.
 
 	All created Stock Entries are left as Drafts - a supervisor reviews
 	and submits each by hand.
 	"""
-	logs_by_item = {}
+	logs_by_group = {}
 	for entry in doc.entries:
 		log = frappe.get_doc("Extrusion Log", entry.extrusion_log)
-		logs_by_item.setdefault(log.sec_no, []).append(log)
+		logs_by_group.setdefault((log.sec_no, log.cut_length), []).append(log)
 
-	input_by_item = {
-		sec_no: sum(flt(log.total_input) for log in logs) for sec_no, logs in logs_by_item.items()
+	input_by_group = {
+		key: sum(flt(log.total_input) for log in logs) for key, logs in logs_by_group.items()
 	}
-	total_input = sum(input_by_item.values())
+	total_input = sum(input_by_group.values())
 
 	created = []
 
-	for sec_no, logs in logs_by_item.items():
-		item_share = (input_by_item[sec_no] / total_input) if total_input else 0
-		scrap_share = flt(doc.scrap_qty) * item_share
+	for (sec_no, cut_length), logs in logs_by_group.items():
+		group_share = (input_by_group[(sec_no, cut_length)] / total_input) if total_input else 0
+		scrap_share = flt(doc.scrap_qty) * group_share
 
-		se = _build_item_stock_entry(doc, sec_no, logs, scrap_share)
+		se = _build_item_stock_entry(doc, sec_no, cut_length, logs, scrap_share)
 		se.insert(ignore_permissions=True)
-		created.append((sec_no, se))
+		reference = sec_no if cut_length == "6.4M Length" else "{0} ({1})".format(sec_no, cut_length)
+		created.append((reference, se))
 
 		for log in logs:
 			frappe.db.set_value("Extrusion Log", log.name, {
@@ -164,7 +168,7 @@ def on_submit(doc, method=None):
 	)
 
 
-def _build_item_stock_entry(doc, sec_no, logs, scrap_share):
+def _build_item_stock_entry(doc, sec_no, cut_length, logs, scrap_share):
 	bom_doc = frappe.get_doc("BOM", logs[0].bom)
 	rm_item = bom_doc.items[0].item_code
 
@@ -195,8 +199,8 @@ def _build_item_stock_entry(doc, sec_no, logs, scrap_share):
 	se.set_posting_time = 1
 	se.custom_extrusion_shift = doc.shift
 	se.custom_extrusion_consolidated = 1
-	se.remarks = "Auto-created from Shift Production Log {0} (Shift {1}, {2}) for item {3}, covering Extrusion Logs: {4}".format(
-		doc.name, doc.shift, doc.date, sec_no, ", ".join(log_names)
+	se.remarks = "Auto-created from Shift Production Log {0} (Shift {1}, {2}) for item {3} ({4}), covering Extrusion Logs: {5}".format(
+		doc.name, doc.shift, doc.date, sec_no, cut_length, ", ".join(log_names)
 	)
 
 	for (item_code, warehouse), qty in rm_totals.items():
@@ -220,10 +224,16 @@ def _build_item_stock_entry(doc, sec_no, logs, scrap_share):
 	# the correct, real production cost, since this entry has exactly one
 	# finished item (Manufacture's one-finished-item-per-entry rule is
 	# satisfied by construction - each item gets its own Stock Entry).
+	#
+	# uom = the log's own cut_length, not a hardcoded standard length - a
+	# special-order length (e.g. 5.5M instead of 6.4M) must use the item's
+	# matching alternate UOM (set up on the Item's UOM table with the
+	# correct conversion factor back to the stock UOM) so the piece count
+	# here is never mislabeled as standard-length output.
 	se.append("items", {
 		"item_code": sec_no,
 		"qty": ok_pcs_total,
-		"uom": "6.4M Length",
+		"uom": cut_length,
 		"t_warehouse": target_warehouse,
 		"is_finished_item": 1,
 		"custom_qty_in_pcs": ok_pcs_total,

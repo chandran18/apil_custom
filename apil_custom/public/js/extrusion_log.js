@@ -24,9 +24,11 @@ frappe.ui.form.on("Extrusion Log", {
 			});
 		}
 		show_stock_indicator(frm);
+		set_cut_length_query(frm);
 	},
 	sec_no: function (frm) {
 		fetch_availability(frm);
+		set_cut_length_query(frm);
 	},
 	source_warehouse: function (frm) {
 		fetch_availability(frm);
@@ -50,6 +52,19 @@ frappe.ui.form.on("Extrusion Log Billet Charge", {
 		calc_total_input(frm);
 	},
 });
+
+function set_cut_length_query(frm) {
+	// Only offer UOMs actually set up as alternates on this item (its Stock
+	// UOM, e.g. standard "6.4M Length", plus any special-order lengths
+	// added to its UOM table) - stops an operator picking an unrelated
+	// length that has no conversion factor on this item at all.
+	frm.set_query("cut_length", function () {
+		return {
+			query: "apil_custom.extrusion_log.query_item_uoms",
+			filters: { item_code: frm.doc.sec_no },
+		};
+	});
+}
 
 function fetch_availability(frm) {
 	if (!frm.doc.sec_no) return;

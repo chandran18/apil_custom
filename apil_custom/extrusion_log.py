@@ -102,3 +102,28 @@ def get_extrusion_rm_availability(item_code, warehouse):
 		) or 0
 
 	return result
+
+
+@frappe.whitelist()
+def query_item_uoms(doctype, txt, searchfield, start, page_len, filters):
+	"""Link-query for the C/L (cut_length) field: only offer UOMs that are
+	actually set up as alternates on the selected item (its Stock UOM, plus
+	any special-order lengths added to the item's own UOM table) - see
+	public/js/extrusion_log.js:set_cut_length_query.
+	"""
+	item_code = (filters or {}).get("item_code")
+	if not item_code:
+		return []
+
+	return frappe.db.sql(
+		"""
+		select uom.name
+		from `tabUOM Conversion Detail` ucd
+		inner join `tabUOM` uom on uom.name = ucd.uom
+		where ucd.parent = %(item_code)s
+		and uom.name like %(txt)s
+		order by uom.name
+		limit %(start)s, %(page_len)s
+		""",
+		{"item_code": item_code, "txt": "%{0}%".format(txt or ""), "start": start, "page_len": page_len},
+	)
