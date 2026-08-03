@@ -197,14 +197,14 @@
    "label": "Stock Linkage"
   },
   {
-   "default": "ravi",
+   "default": "Alu Products Industries Ltd",
    "fieldname": "company",
    "fieldtype": "Link",
    "label": "Company",
    "options": "Company"
   },
   {
-   "default": "Finished Goods - R",
+   "default": "Furnace - Ap",
    "fieldname": "source_warehouse",
    "fieldtype": "Link",
    "label": "Billet Source Warehouse",
@@ -215,7 +215,7 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "Stores - R",
+   "default": "Finished Goods - Ap",
    "fieldname": "target_warehouse",
    "fieldtype": "Link",
    "label": "Output Target Warehouse",

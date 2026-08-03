@@ -50,7 +50,7 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "ravi",
+   "default": "Alu Products Industries Ltd",
    "fieldname": "company",
    "fieldtype": "Link",
    "label": "Company",
@@ -118,6 +118,7 @@
    "reqd": 1
   },
   {
+   "default": "Furnace - Ap",
    "fieldname": "scrap_warehouse",
    "fieldtype": "Link",
    "label": "Scrap Warehouse",
