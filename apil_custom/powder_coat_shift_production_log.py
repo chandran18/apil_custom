@@ -2,7 +2,8 @@ import frappe
 from frappe.utils import cint, flt, getdate
 
 ENTRY_FETCH_FIELDS = [
-	"item", "batch_no_ref", "cut_length", "pieces", "actual_powder_consumption", "calculated_gas_consumption", "remarks",
+	"item", "powder_item", "batch_no_ref", "cut_length", "pieces", "actual_powder_consumption",
+	"calculated_gas_consumption", "remarks",
 ]
 
 
@@ -103,42 +104,43 @@ def on_submit(doc, method=None):
 	one paint total - each colour gets its own entry.
 
 	Each Stock Entry consumes the M/F piece count and produces the P/C
-	finished item; the paint/powder item's qty comes from each batch's own
-	(possibly manually-overridden) Actual Powder Consumption, summed across
-	every batch in the group, then scaled by a single shift-wide factor if
-	the supervisor overrode the shift's Actual Total Powder Consumption
-	away from the calculated total - the same proportional-by-share
-	approach as splitting Scrap on the Extrusion side, just applied at
-	shift level instead of by hand. Gas consumption tracking is currently
-	disabled (see apil_custom/powder_coat_log.py).
+	finished item. The paint/powder quantity is NOT summed up from each
+	batch's own Actual Powder Consumption - the shift's Actual Total
+	Powder Consumption is divided EQUALLY across however many Stock
+	Entries this shift produces, and every group gets that same equal
+	share regardless of its own pieces/weight. That equal share is also
+	written back onto every child row belonging to that group (Powder Qty
+	in Stock Entry), so it's visible here without opening each Stock Entry.
+	Gas consumption tracking is currently disabled (see
+	apil_custom/powder_coat_log.py).
 
 	All created Stock Entries are left as Drafts - a supervisor reviews and
 	submits each by hand, exactly like the Extrusion side.
 	"""
-	scale_factor = 1
-	if flt(doc.total_powder_consumption):
-		scale_factor = flt(doc.actual_total_powder_consumption) / flt(doc.total_powder_consumption)
-
 	logs_by_group = {}
 	for entry in doc.entries:
 		log = frappe.get_doc("Powder Coat Log", entry.powder_coat_log)
-		logs_by_group.setdefault((log.item, log.cut_length, log.powder_item), []).append(log)
+		logs_by_group.setdefault((log.item, log.cut_length, log.powder_item), []).append((log, entry))
+
+	equal_share = round(flt(doc.actual_total_powder_consumption) / len(logs_by_group), 4) if logs_by_group else 0
 
 	created = []
 
-	for (item, cut_length, powder_item), logs in logs_by_group.items():
-		se = _build_item_stock_entry(doc, item, cut_length, powder_item, logs, scale_factor)
+	for (item, cut_length, powder_item), log_entry_pairs in logs_by_group.items():
+		logs = [pair[0] for pair in log_entry_pairs]
+		se = _build_item_stock_entry(doc, item, cut_length, powder_item, logs, equal_share)
 		se.insert(ignore_permissions=True)
 		reference = item if cut_length == "6.4M Length" else "{0} ({1})".format(item, cut_length)
 		if powder_item:
 			reference = "{0} [{1}]".format(reference, powder_item)
 		created.append((reference, se))
 
-		for log in logs:
+		for log, entry in log_entry_pairs:
 			frappe.db.set_value("Powder Coat Log", log.name, {
 				"stock_entry": se.name,
 				"included_in_shift_log": doc.name,
 			})
+			entry.stock_entry_powder_qty = equal_share
 
 	for reference, se in created:
 		doc.append("created_stock_entries", {"reference": reference, "stock_entry": se.name})
@@ -152,13 +154,12 @@ def on_submit(doc, method=None):
 	)
 
 
-def _build_item_stock_entry(doc, item, cut_length, powder_item, logs, scale_factor=1):
+def _build_item_stock_entry(doc, item, cut_length, powder_item, logs, paint_qty):
 	bom_doc = frappe.get_doc("BOM", logs[0].bom)
 	mf_item = bom_doc.items[0].item_code
 
 	mf_totals = {}
 	pieces_total = 0
-	paint_total = 0
 	target_warehouse = logs[0].target_warehouse
 	consumables_warehouse = logs[0].consumables_warehouse
 	log_names = []
@@ -173,7 +174,6 @@ def _build_item_stock_entry(doc, item, cut_length, powder_item, logs, scale_fact
 		# created before this was disabled that still carry old gas figures.
 
 		pieces_total += flt(log.pieces)
-		paint_total += flt(log.actual_powder_consumption)
 
 	se = frappe.new_doc("Stock Entry")
 	se.stock_entry_type = "Manufacture"
@@ -194,11 +194,10 @@ def _build_item_stock_entry(doc, item, cut_length, powder_item, logs, scale_fact
 			"s_warehouse": warehouse,
 		})
 
-	scaled_paint_total = round(paint_total * flt(scale_factor), 4)
-	if powder_item and scaled_paint_total > 0:
+	if powder_item and flt(paint_qty) > 0:
 		se.append("items", {
 			"item_code": powder_item,
-			"qty": scaled_paint_total,
+			"qty": paint_qty,
 			"uom": "Kg",
 			"s_warehouse": consumables_warehouse,
 		})

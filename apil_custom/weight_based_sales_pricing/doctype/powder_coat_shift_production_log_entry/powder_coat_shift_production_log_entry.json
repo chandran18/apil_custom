@@ -8,10 +8,12 @@
  "field_order": [
   "powder_coat_log",
   "item",
+  "powder_item",
   "batch_no_ref",
   "cut_length",
   "pieces",
   "actual_powder_consumption",
+  "stock_entry_powder_qty",
   "calculated_gas_consumption",
   "remarks"
  ],
@@ -30,6 +32,15 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "P/C Item",
+   "options": "Item",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "powder_coat_log.powder_item",
+   "fieldname": "powder_item",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Powder/Paint Item",
    "options": "Item",
    "read_only": 1
   },
@@ -66,11 +77,20 @@
    "read_only": 1
   },
   {
+   "description": "How much of this Stock Entry's powder/paint quantity this row's group ended up with, after the shift's Actual Total Powder Consumption was split equally across every distinct Stock Entry created.",
+   "fieldname": "stock_entry_powder_qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Powder Qty in Stock Entry (Kg)",
+   "read_only": 1
+  },
+  {
    "fetch_from": "powder_coat_log.calculated_gas_consumption",
    "fieldname": "calculated_gas_consumption",
    "fieldtype": "Float",
    "label": "Gas Consumption (Kg)",
-   "read_only": 1
+   "read_only": 1,
+   "hidden": 1
   },
   {
    "fetch_from": "powder_coat_log.remarks",
