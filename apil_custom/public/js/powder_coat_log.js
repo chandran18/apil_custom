@@ -23,6 +23,7 @@ frappe.ui.form.on("Powder Coat Log", {
 		}
 		show_stock_indicator(frm);
 		set_cut_length_query(frm);
+		set_powder_item_query(frm);
 	},
 	item: function (frm) {
 		fetch_availability(frm);
@@ -36,6 +37,15 @@ frappe.ui.form.on("Powder Coat Log", {
 		calc_powder_consumption(frm);
 	},
 });
+
+function set_powder_item_query(frm) {
+	// Only offer real powder/paint items (named "RAL ..." in this catalog) -
+	// the generic 'Consumables' item group also holds unrelated furnace
+	// chemicals and filters.
+	frm.set_query("powder_item", function () {
+		return { query: "apil_custom.powder_coat_log.query_powder_items" };
+	});
+}
 
 function set_cut_length_query(frm) {
 	// Reuses the same generic UOM link-query already built for Extrusion

@@ -28,6 +28,13 @@ def before_save(doc, method=None):
 	doc.total_powder_consumption = round(sum(flt(e.actual_powder_consumption) for e in doc.entries), 4)
 	doc.total_gas_consumption = round(sum(flt(e.calculated_gas_consumption) for e in doc.entries), 4)
 
+	# Free-entry field: default from the calculated total for convenience,
+	# but never overwrite a figure the supervisor already entered by hand -
+	# same auto-fill-then-editable pattern as each batch's own Actual
+	# Powder Consumption field.
+	if not doc.actual_total_powder_consumption:
+		doc.actual_total_powder_consumption = doc.total_powder_consumption
+
 
 def before_submit(doc, method=None):
 	"""Block submit if any row's batch isn't ready: not actually submitted
@@ -87,34 +94,44 @@ def before_submit(doc, method=None):
 
 
 def on_submit(doc, method=None):
-	"""Create one Stock Entry per distinct (item, cut length) batch this
-	shift (Manufacture type - correctly auto-costed, one finished item
-	each). Grouped by item AND length for the same reason as the extrusion
-	side: a special-length batch needs its own row rather than being summed
-	in with standard-length pieces of the same item.
+	"""Create one Stock Entry per distinct (item, cut length, powder item)
+	batch this shift (Manufacture type - correctly auto-costed, one
+	finished item each). Grouped by powder item as well as item/length: an
+	operator can coat the same profile in two different real RAL colours
+	within one shift (see Powder Coat Log's own Powder/Paint Item field),
+	and those must never be merged into a single Stock Entry line sharing
+	one paint total - each colour gets its own entry.
 
-	Each Stock Entry consumes the M/F piece count and the BOM-driven Gas,
-	and produces the P/C finished item; the paint/powder item's qty comes
-	straight from each batch's own (possibly manually-overridden) Actual
-	Powder Consumption - already scaled to that batch's Pieces - simply
-	summed across every batch in the group. The paint item itself is
-	resolved from each batch's own BOM (not hardcoded), since different
-	profiles in this catalog use different RAL colours.
+	Each Stock Entry consumes the M/F piece count and produces the P/C
+	finished item; the paint/powder item's qty comes from each batch's own
+	(possibly manually-overridden) Actual Powder Consumption, summed across
+	every batch in the group, then scaled by a single shift-wide factor if
+	the supervisor overrode the shift's Actual Total Powder Consumption
+	away from the calculated total - the same proportional-by-share
+	approach as splitting Scrap on the Extrusion side, just applied at
+	shift level instead of by hand. Gas consumption tracking is currently
+	disabled (see apil_custom/powder_coat_log.py).
 
 	All created Stock Entries are left as Drafts - a supervisor reviews and
 	submits each by hand, exactly like the Extrusion side.
 	"""
+	scale_factor = 1
+	if flt(doc.total_powder_consumption):
+		scale_factor = flt(doc.actual_total_powder_consumption) / flt(doc.total_powder_consumption)
+
 	logs_by_group = {}
 	for entry in doc.entries:
 		log = frappe.get_doc("Powder Coat Log", entry.powder_coat_log)
-		logs_by_group.setdefault((log.item, log.cut_length), []).append(log)
+		logs_by_group.setdefault((log.item, log.cut_length, log.powder_item), []).append(log)
 
 	created = []
 
-	for (item, cut_length), logs in logs_by_group.items():
-		se = _build_item_stock_entry(doc, item, cut_length, logs)
+	for (item, cut_length, powder_item), logs in logs_by_group.items():
+		se = _build_item_stock_entry(doc, item, cut_length, powder_item, logs, scale_factor)
 		se.insert(ignore_permissions=True)
 		reference = item if cut_length == "6.4M Length" else "{0} ({1})".format(item, cut_length)
+		if powder_item:
+			reference = "{0} [{1}]".format(reference, powder_item)
 		created.append((reference, se))
 
 		for log in logs:
@@ -129,23 +146,17 @@ def on_submit(doc, method=None):
 
 	frappe.msgprint(
 		"Created {0} draft Stock Entry(s) for this shift - one per item, each including its powder/paint "
-		"consumption and BOM-driven gas use. Please review and submit each one manually.".format(len(created)),
+		"consumption. Please review and submit each one manually.".format(len(created)),
 		title="Shift Stock Entries Created",
 		indicator="blue",
 	)
 
 
-def _build_item_stock_entry(doc, item, cut_length, logs):
+def _build_item_stock_entry(doc, item, cut_length, powder_item, logs, scale_factor=1):
 	bom_doc = frappe.get_doc("BOM", logs[0].bom)
 	mf_item = bom_doc.items[0].item_code
-	paint_item = None
-	for bom_item in bom_doc.items[1:]:
-		if bom_item.item_code != "Industrial Gas":
-			paint_item = bom_item.item_code
-			break
 
 	mf_totals = {}
-	gas_totals = {}
 	pieces_total = 0
 	paint_total = 0
 	target_warehouse = logs[0].target_warehouse
@@ -157,13 +168,9 @@ def _build_item_stock_entry(doc, item, cut_length, logs):
 		mf_key = (mf_item, log.source_warehouse)
 		mf_totals[mf_key] = mf_totals.get(mf_key, 0) + flt(log.pieces)
 
-		if log.gas_item and log.calculated_gas_consumption:
-			# Gas is a consumable kept in Stores (Gas/Paint Warehouse), not
-			# in source_warehouse (M/F) or target_warehouse (P/C output) -
-			# those track the actual production flow, this tracks where the
-			# consumable itself physically sits.
-			gas_key = (log.gas_item, log.consumables_warehouse)
-			gas_totals[gas_key] = gas_totals.get(gas_key, 0) + flt(log.calculated_gas_consumption)
+		# Gas consumption is disabled (see apil_custom/powder_coat_log.py)
+		# - deliberately never added as a Stock Entry row, even for logs
+		# created before this was disabled that still carry old gas figures.
 
 		pieces_total += flt(log.pieces)
 		paint_total += flt(log.actual_powder_consumption)
@@ -187,18 +194,11 @@ def _build_item_stock_entry(doc, item, cut_length, logs):
 			"s_warehouse": warehouse,
 		})
 
-	for (item_code, warehouse), qty in gas_totals.items():
+	scaled_paint_total = round(paint_total * flt(scale_factor), 4)
+	if powder_item and scaled_paint_total > 0:
 		se.append("items", {
-			"item_code": item_code,
-			"qty": qty,
-			"uom": "Kg",
-			"s_warehouse": warehouse,
-		})
-
-	if paint_item and paint_total > 0:
-		se.append("items", {
-			"item_code": paint_item,
-			"qty": paint_total,
+			"item_code": powder_item,
+			"qty": scaled_paint_total,
 			"uom": "Kg",
 			"s_warehouse": consumables_warehouse,
 		})

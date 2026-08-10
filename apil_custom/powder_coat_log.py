@@ -35,9 +35,16 @@ def before_save(doc, method=None):
 	if not doc.actual_powder_consumption:
 		doc.actual_powder_consumption = doc.calculated_powder_consumption
 
+	# Gas consumption tracking is disabled for now: several sites have
+	# "Industrial Gas" set up as a non-stock Item, which makes ERPNext
+	# reject any Stock Entry that tries to move it ("... is not a stock
+	# Item"). Rather than require every site to fix that Item master data
+	# before the Powder Coat workflow is usable, gas is left out of both
+	# the calculation and the Stock Entry entirely until re-enabled.
 	doc.rm_item = None
 	doc.gas_item = None
 	doc.calculated_gas_consumption = 0
+	bom_paint_item = None
 	if doc.bom:
 		bom_items = frappe.get_all(
 			"BOM Item", filters={"parent": doc.bom}, fields=["item_code", "qty"], order_by="idx asc"
@@ -45,9 +52,15 @@ def before_save(doc, method=None):
 		if bom_items:
 			doc.rm_item = bom_items[0].item_code
 			for bom_item in bom_items[1:]:
-				if bom_item.item_code == "Industrial Gas":
-					doc.gas_item = bom_item.item_code
-					doc.calculated_gas_consumption = round(flt(bom_item.qty) * flt(doc.pieces), 4)
+				if bom_item.item_code != "Industrial Gas":
+					bom_paint_item = bom_item.item_code
+
+	# Free-entry field: default from the BOM's paint row for convenience,
+	# but never overwrite a choice the operator already made - different
+	# orders often coat the same profile in a different real RAL colour
+	# than whatever the BOM happens to carry.
+	if not doc.powder_item:
+		doc.powder_item = bom_paint_item
 
 	if doc.rm_item and doc.source_warehouse:
 		doc.available_stock = frappe.db.get_value(
@@ -65,6 +78,8 @@ def before_submit(doc, method=None):
 		frappe.throw("No active BOM found for {0}. Cannot validate or create stock movement.".format(doc.item))
 	if not doc.rm_item:
 		frappe.throw("Could not resolve the M/F item from BOM {0}.".format(doc.bom))
+	if not doc.powder_item:
+		frappe.throw("Pick the Powder/Paint Item actually used for this batch before submitting.")
 
 	conversion_factor = 1
 	if doc.cut_length:
@@ -87,6 +102,26 @@ def before_submit(doc, method=None):
 			),
 			title="Stock Not Sufficient",
 		)
+
+
+@frappe.whitelist()
+def query_powder_items(doctype, txt, searchfield, start, page_len, filters):
+	"""Link-query for the Powder/Paint Item field: only offer real powder/
+	paint items (named "RAL ..." in this catalog), not the furnace
+	chemicals and filters that share the same generic 'Consumables' item
+	group - see public/js/powder_coat_log.js.
+	"""
+	return frappe.db.sql(
+		"""
+		select name from `tabItem`
+		where item_code like 'RAL%%'
+		and disabled = 0
+		and name like %(txt)s
+		order by name
+		limit %(start)s, %(page_len)s
+		""",
+		{"txt": "%{0}%".format(txt or ""), "start": start, "page_len": page_len},
+	)
 
 
 @frappe.whitelist()

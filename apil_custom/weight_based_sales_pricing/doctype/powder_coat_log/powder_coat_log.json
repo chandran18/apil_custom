@@ -19,6 +19,7 @@
   "column_break_2",
   "remarks",
   "section_break_powder",
+  "powder_item",
   "catalogue_weight",
   "consumption_percent",
   "column_break_3",
@@ -117,6 +118,13 @@
    "label": "Powder / Paint Consumption"
   },
   {
+   "description": "Which powder/paint variant was actually used for this batch. Defaults from the item's BOM but is fully editable - different orders often coat the same profile in different RAL colours, so pick whatever was really used.",
+   "fieldname": "powder_item",
+   "fieldtype": "Link",
+   "label": "Powder/Paint Item",
+   "options": "Item"
+  },
+  {
    "fetch_from": "item.custom_catalogue_weight",
    "fieldname": "catalogue_weight",
    "fieldtype": "Float",
@@ -150,21 +158,24 @@
   {
    "fieldname": "section_break_gas",
    "fieldtype": "Section Break",
-   "label": "Gas Consumption"
+   "label": "Gas Consumption",
+   "hidden": 1
   },
   {
    "fieldname": "gas_item",
    "fieldtype": "Link",
    "label": "Gas Item",
    "options": "Item",
-   "read_only": 1
+   "read_only": 1,
+   "hidden": 1
   },
   {
-   "description": "From this item's Powder Coat BOM (Gas qty x Pieces) - curing-oven gas use is fixed by the BOM, unlike Extrusion Log where it's measured per batch.",
+   "description": "Disabled: several sites carry Industrial Gas as a non-stock Item, which blocked Stock Entry submission. Gas consumption is no longer calculated or moved to stock until this is re-enabled.",
    "fieldname": "calculated_gas_consumption",
    "fieldtype": "Float",
    "label": "Gas Consumption (Kg)",
-   "read_only": 1
+   "read_only": 1,
+   "hidden": 1
   },
   {
    "fieldname": "section_break_stock",
