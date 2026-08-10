@@ -73,6 +73,26 @@ def before_submit(doc, method=None):
 		if not log.bom or not log.rm_item:
 			frappe.throw("Powder Coat Log {0} has no BOM/M-F item resolved for item {1}.".format(log.name, log.item))
 
+		# Catch a missing warehouse here, naming the exact log and field -
+		# older logs submitted before this was validated on Powder Coat
+		# Log itself can still be missing one, and without this check the
+		# failure only surfaces later as a generic "Source warehouse is
+		# mandatory for row N" error from deep inside the Stock Entry this
+		# builds, which doesn't say which batch or field is at fault.
+		missing = []
+		if not log.source_warehouse:
+			missing.append("M/F Source Warehouse")
+		if not log.target_warehouse:
+			missing.append("P/C Output Warehouse")
+		if not log.consumables_warehouse:
+			missing.append("Gas/Paint Warehouse")
+		if missing:
+			frappe.throw(
+				"Powder Coat Log {0} is missing: {1}. Open it and set these before submitting this shift.".format(
+					log.name, ", ".join(missing)
+				)
+			)
+
 		conversion_factor = 1
 		if log.cut_length:
 			stock_uom = frappe.db.get_value("Item", log.rm_item, "stock_uom")

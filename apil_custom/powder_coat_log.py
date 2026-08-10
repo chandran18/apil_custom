@@ -81,6 +81,22 @@ def before_submit(doc, method=None):
 	if not doc.powder_item:
 		frappe.throw("Pick the Powder/Paint Item actually used for this batch before submitting.")
 
+	# Catch a missing warehouse here, with a clear message naming this
+	# exact batch and field - rather than letting it surface later as a
+	# generic "Source warehouse is mandatory for row N" error from deep
+	# inside the Stock Entry that Shift Production Log builds when it
+	# consolidates this log (which doesn't say WHICH batch or field is at
+	# fault).
+	missing = []
+	if not doc.source_warehouse:
+		missing.append("M/F Source Warehouse")
+	if not doc.target_warehouse:
+		missing.append("P/C Output Warehouse")
+	if not doc.consumables_warehouse:
+		missing.append("Gas/Paint Warehouse")
+	if missing:
+		frappe.throw("Set the following before submitting this batch: {0}.".format(", ".join(missing)))
+
 	conversion_factor = 1
 	if doc.cut_length:
 		stock_uom = frappe.db.get_value("Item", doc.rm_item, "stock_uom")
