@@ -168,6 +168,33 @@ def on_submit(doc, method=None):
 	)
 
 
+def before_cancel(doc, method=None):
+	"""Cancel every still-submitted Stock Entry this shift created, and
+	clear the back-links on every Extrusion Log this shift claimed - both
+	BEFORE Frappe's own link-integrity check runs, which would otherwise
+	block cancelling this document outright ("Cannot cancel because ...
+	is linked with Extrusion Log"). This fully undoes the consolidation:
+	the Extrusion Logs become free again (pickable by a new shift log),
+	and any real stock movement already made is reversed.
+	"""
+	# Clear the Extrusion Logs' own links to the Stock Entry FIRST - a
+	# Stock Entry can't be cancelled while a still-submitted Extrusion
+	# Log's `stock_entry` field still points at it.
+	for entry in doc.entries:
+		if entry.extrusion_log:
+			frappe.db.set_value("Extrusion Log", entry.extrusion_log, {
+				"stock_entry": None,
+				"included_in_shift_log": None,
+			})
+
+	for row in doc.created_stock_entries:
+		if not row.stock_entry:
+			continue
+		se = frappe.get_doc("Stock Entry", row.stock_entry)
+		if se.docstatus == 1:
+			se.cancel()
+
+
 def _build_item_stock_entry(doc, sec_no, cut_length, logs, scrap_share):
 	bom_doc = frappe.get_doc("BOM", logs[0].bom)
 	rm_item = bom_doc.items[0].item_code

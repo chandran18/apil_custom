@@ -77,7 +77,7 @@
    "read_only": 1
   },
   {
-   "description": "How much of this Stock Entry's powder/paint quantity this row's group ended up with, after the shift's Actual Total Powder Consumption was split equally across every distinct Stock Entry created.",
+   "description": "This row's group's own powder consumption plus its equal share of the gap between the shift's Actual and Calculated totals - the figure that actually lands on the group's Stock Entry.",
    "fieldname": "stock_entry_powder_qty",
    "fieldtype": "Float",
    "in_list_view": 1,

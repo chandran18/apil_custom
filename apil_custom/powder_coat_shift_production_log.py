@@ -104,14 +104,18 @@ def on_submit(doc, method=None):
 	one paint total - each colour gets its own entry.
 
 	Each Stock Entry consumes the M/F piece count and produces the P/C
-	finished item. The paint/powder quantity is NOT summed up from each
-	batch's own Actual Powder Consumption - the shift's Actual Total
-	Powder Consumption is divided EQUALLY across however many Stock
-	Entries this shift produces, and every group gets that same equal
-	share regardless of its own pieces/weight. That equal share is also
-	written back onto every child row belonging to that group (Powder Qty
-	in Stock Entry), so it's visible here without opening each Stock Entry.
-	Gas consumption tracking is currently disabled (see
+	finished item. The paint/powder quantity for each group is its own
+	system-generated figure (the sum of that group's batches' own Actual
+	Powder Consumption) PLUS an adjustment: the gap between the shift's
+	Actual Total Powder Consumption and the Calculated Total (i.e. what
+	the supervisor's real reported total is short of or over the sum of
+	individual figures), split EQUALLY across however many Stock Entries
+	this shift produces. So every group keeps its own real number as a
+	base, and only the leftover difference is shared out evenly on top -
+	not the whole total redone from scratch. That final per-group figure
+	is also written back onto every child row belonging to that group
+	(Powder Qty in Stock Entry), so it's visible here without opening each
+	Stock Entry. Gas consumption tracking is currently disabled (see
 	apil_custom/powder_coat_log.py).
 
 	All created Stock Entries are left as Drafts - a supervisor reviews and
@@ -122,13 +126,20 @@ def on_submit(doc, method=None):
 		log = frappe.get_doc("Powder Coat Log", entry.powder_coat_log)
 		logs_by_group.setdefault((log.item, log.cut_length, log.powder_item), []).append((log, entry))
 
-	equal_share = round(flt(doc.actual_total_powder_consumption) / len(logs_by_group), 4) if logs_by_group else 0
+	num_groups = len(logs_by_group)
+	difference = flt(doc.actual_total_powder_consumption) - flt(doc.total_powder_consumption)
+	adjustment_per_group = (difference / num_groups) if num_groups else 0
 
 	created = []
 
 	for (item, cut_length, powder_item), log_entry_pairs in logs_by_group.items():
 		logs = [pair[0] for pair in log_entry_pairs]
-		se = _build_item_stock_entry(doc, item, cut_length, powder_item, logs, equal_share)
+		group_calculated = sum(flt(log.actual_powder_consumption) for log in logs)
+		# Never let a negative adjustment push a group's own real figure
+		# below zero - a Stock Entry can't carry a negative quantity.
+		group_final_qty = max(0, round(group_calculated + adjustment_per_group, 4))
+
+		se = _build_item_stock_entry(doc, item, cut_length, powder_item, logs, group_final_qty)
 		se.insert(ignore_permissions=True)
 		reference = item if cut_length == "6.4M Length" else "{0} ({1})".format(item, cut_length)
 		if powder_item:
@@ -140,7 +151,7 @@ def on_submit(doc, method=None):
 				"stock_entry": se.name,
 				"included_in_shift_log": doc.name,
 			})
-			entry.stock_entry_powder_qty = equal_share
+			entry.stock_entry_powder_qty = group_final_qty
 
 	for reference, se in created:
 		doc.append("created_stock_entries", {"reference": reference, "stock_entry": se.name})
@@ -152,6 +163,34 @@ def on_submit(doc, method=None):
 		title="Shift Stock Entries Created",
 		indicator="blue",
 	)
+
+
+def before_cancel(doc, method=None):
+	"""Cancel every still-submitted Stock Entry this shift created, and
+	clear the back-links on every Powder Coat Log this shift claimed -
+	both BEFORE Frappe's own link-integrity check runs, which would
+	otherwise block cancelling this document outright ("Cannot cancel
+	because ... is linked with Powder Coat Log"). This fully undoes the
+	consolidation: the Powder Coat Logs become free again (pickable by a
+	new shift log), and any real stock movement already made is reversed.
+	Mirrors apil_custom/shift_production_log.py's before_cancel.
+	"""
+	# Clear the Powder Coat Logs' own links to the Stock Entry FIRST - a
+	# Stock Entry can't be cancelled while a still-submitted Powder Coat
+	# Log's `stock_entry` field still points at it.
+	for entry in doc.entries:
+		if entry.powder_coat_log:
+			frappe.db.set_value("Powder Coat Log", entry.powder_coat_log, {
+				"stock_entry": None,
+				"included_in_shift_log": None,
+			})
+
+	for row in doc.created_stock_entries:
+		if not row.stock_entry:
+			continue
+		se = frappe.get_doc("Stock Entry", row.stock_entry)
+		if se.docstatus == 1:
+			se.cancel()
 
 
 def _build_item_stock_entry(doc, item, cut_length, powder_item, logs, paint_qty):

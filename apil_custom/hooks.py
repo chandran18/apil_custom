@@ -263,6 +263,7 @@ doc_events = {
 		"validate": "apil_custom.shift_production_log.before_save",
 		"before_submit": "apil_custom.shift_production_log.before_submit",
 		"on_submit": "apil_custom.shift_production_log.on_submit",
+		"before_cancel": "apil_custom.shift_production_log.before_cancel",
 	},
 	"Powder Coat Log": {
 		"validate": "apil_custom.powder_coat_log.before_save",
@@ -272,6 +273,7 @@ doc_events = {
 		"validate": "apil_custom.powder_coat_shift_production_log.before_save",
 		"before_submit": "apil_custom.powder_coat_shift_production_log.before_submit",
 		"on_submit": "apil_custom.powder_coat_shift_production_log.on_submit",
+		"before_cancel": "apil_custom.powder_coat_shift_production_log.before_cancel",
 	},
 	"Stock Ledger Entry": {
 		"validate": "apil_custom.overrides.stock_ledger.set_qty_in_pcs",

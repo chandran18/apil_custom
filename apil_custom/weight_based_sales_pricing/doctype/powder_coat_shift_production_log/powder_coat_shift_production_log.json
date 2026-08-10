@@ -84,7 +84,7 @@
    "read_only": 1
   },
   {
-   "description": "Defaults to the calculated total alongside it but can be overridden with the shift's real reported total (e.g. from a paper report that only gives one combined figure). This total is split EQUALLY across however many Stock Entries this shift produces - each item/colour gets the same share regardless of its own pieces or weight.",
+   "description": "Defaults to the calculated total alongside it but can be overridden with the shift's real reported total (e.g. from a paper report that only gives one combined figure). Only the DIFFERENCE from the calculated total is split equally across this shift's Stock Entries - each keeps its own real figure as a base and shares the leftover gap evenly on top.",
    "fieldname": "actual_total_powder_consumption",
    "fieldtype": "Float",
    "label": "Actual Total Powder Consumption (Kg)"
