@@ -1,0 +1,149 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:PCSPL-{date}-{shift}-{#####}",
+ "creation": "2026-08-09 07:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "shift",
+  "column_break_1",
+  "company",
+  "section_break_entries",
+  "entries",
+  "section_break_totals",
+  "total_pieces",
+  "total_powder_consumption",
+  "column_break_2",
+  "total_gas_consumption",
+  "section_break_stock",
+  "created_stock_entries",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "shift",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Shift",
+   "options": "\nA\nB\nC",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Alu Products Industries Ltd",
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_entries",
+   "fieldtype": "Section Break",
+   "label": "Batches"
+  },
+  {
+   "description": "Pick this shift's already-submitted Powder Coat Logs (one row per batch/item run). Each row's details are pulled in automatically from the log.",
+   "fieldname": "entries",
+   "fieldtype": "Table",
+   "label": "Batches",
+   "options": "Powder Coat Shift Production Log Entry",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_totals",
+   "fieldtype": "Section Break",
+   "label": "Shift Totals"
+  },
+  {
+   "fieldname": "total_pieces",
+   "fieldtype": "Int",
+   "label": "Total Pieces",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_powder_consumption",
+   "fieldtype": "Float",
+   "label": "Total Powder Consumption (Kg)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_gas_consumption",
+   "fieldtype": "Float",
+   "label": "Total Gas Consumption (Kg)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_stock",
+   "fieldtype": "Section Break",
+   "label": "Stock Linkage"
+  },
+  {
+   "description": "One Stock Entry per distinct item in this shift (Manufacture type, auto-costed), consuming M/F pieces and BOM-driven Gas, and the batch's powder/paint consumption.",
+   "fieldname": "created_stock_entries",
+   "fieldtype": "Table",
+   "label": "Created Stock Entries",
+   "options": "Shift Production Log Stock Entry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Powder Coat Shift Production Log",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-08-09 07:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Weight Based Sales Pricing",
+ "name": "Powder Coat Shift Production Log",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "shift"
+}

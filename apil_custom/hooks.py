@@ -36,6 +36,7 @@ fixtures = [
 					"Stock Entry-custom_extrusion_consolidated",
 					"Stock Entry Detail-custom_auto_consolidated",
 					"Stock Entry Detail-custom_extrusion_is_scrap",
+					"Item-custom_powder_consumption_percent",
 					"Item-custom_pc_category",
 					"Customer-discount_prices",
 					"Sales Order Item-custom_base_rate_per_kg",
@@ -88,11 +89,14 @@ fixtures = [
 	},
 ]
 # Extrusion Log, Extrusion Log Billet Charge, Shift Production Log,
-# Shift Production Log Entry, APIL Settings and Customer Discount Price
-# are NOT fixtures - they are native app doctypes (custom=0) with their
-# own json + controller files under weight_based_sales_pricing/doctype/,
-# converted via the
-# convert_custom_doctypes_to_app_doctypes patch.
+# Shift Production Log Entry, Shift Production Log Stock Entry,
+# Powder Coat Log, Powder Coat Shift Production Log,
+# Powder Coat Shift Production Log Entry, APIL Settings and Customer
+# Discount Price are NOT fixtures - they are native app doctypes (custom=0)
+# with their own json + controller files under
+# weight_based_sales_pricing/doctype/. The Extrusion/Shift ones were
+# converted via the convert_custom_doctypes_to_app_doctypes patch; the
+# Powder Coat ones were created directly as app doctypes from the start.
 #
 # The APIL Mobile Approver role, its Custom DocPerm rows, and the mobile
 # device/notification/approval code have all moved to the separate
@@ -144,6 +148,8 @@ doctype_js = {
 	"Sales Invoice": "public/js/weight_pricing.js",
 	"Extrusion Log": "public/js/extrusion_log.js",
 	"Shift Production Log": "public/js/shift_production_log.js",
+	"Powder Coat Log": "public/js/powder_coat_log.js",
+	"Powder Coat Shift Production Log": "public/js/powder_coat_shift_production_log.js",
 }
 doctype_list_js = {
 	"Extrusion Log": "public/js/extrusion_log_list.js",
@@ -257,6 +263,15 @@ doc_events = {
 		"validate": "apil_custom.shift_production_log.before_save",
 		"before_submit": "apil_custom.shift_production_log.before_submit",
 		"on_submit": "apil_custom.shift_production_log.on_submit",
+	},
+	"Powder Coat Log": {
+		"validate": "apil_custom.powder_coat_log.before_save",
+		"before_submit": "apil_custom.powder_coat_log.before_submit",
+	},
+	"Powder Coat Shift Production Log": {
+		"validate": "apil_custom.powder_coat_shift_production_log.before_save",
+		"before_submit": "apil_custom.powder_coat_shift_production_log.before_submit",
+		"on_submit": "apil_custom.powder_coat_shift_production_log.on_submit",
 	},
 	"Stock Ledger Entry": {
 		"validate": "apil_custom.overrides.stock_ledger.set_qty_in_pcs",

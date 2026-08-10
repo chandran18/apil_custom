@@ -1,0 +1,98 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "creation": "2026-08-09 07:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "powder_coat_log",
+  "item",
+  "batch_no_ref",
+  "cut_length",
+  "pieces",
+  "actual_powder_consumption",
+  "calculated_gas_consumption",
+  "remarks"
+ ],
+ "fields": [
+  {
+   "fieldname": "powder_coat_log",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Powder Coat Log",
+   "options": "Powder Coat Log",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "powder_coat_log.item",
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "P/C Item",
+   "options": "Item",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "powder_coat_log.batch_no_ref",
+   "fieldname": "batch_no_ref",
+   "fieldtype": "Data",
+   "label": "Batch No",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "powder_coat_log.cut_length",
+   "fieldname": "cut_length",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "C/L",
+   "options": "UOM",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "powder_coat_log.pieces",
+   "fieldname": "pieces",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Pieces",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "powder_coat_log.actual_powder_consumption",
+   "fieldname": "actual_powder_consumption",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Powder Consumption (Kg)",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "powder_coat_log.calculated_gas_consumption",
+   "fieldname": "calculated_gas_consumption",
+   "fieldtype": "Float",
+   "label": "Gas Consumption (Kg)",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "powder_coat_log.remarks",
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-08-09 07:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Weight Based Sales Pricing",
+ "name": "Powder Coat Shift Production Log Entry",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
