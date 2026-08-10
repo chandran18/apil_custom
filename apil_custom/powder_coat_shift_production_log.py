@@ -149,6 +149,7 @@ def _build_item_stock_entry(doc, item, cut_length, logs):
 	pieces_total = 0
 	paint_total = 0
 	target_warehouse = logs[0].target_warehouse
+	consumables_warehouse = logs[0].consumables_warehouse
 	log_names = []
 
 	for log in logs:
@@ -157,10 +158,11 @@ def _build_item_stock_entry(doc, item, cut_length, logs):
 		mf_totals[mf_key] = mf_totals.get(mf_key, 0) + flt(log.pieces)
 
 		if log.gas_item and log.calculated_gas_consumption:
-			# Gas is a consumable stocked alongside chemicals/profiles in
-			# target_warehouse (Stores), not in source_warehouse (where the
-			# M/F profiles live) - same reasoning as the Extrusion side.
-			gas_key = (log.gas_item, log.target_warehouse)
+			# Gas is a consumable kept in Stores (Gas/Paint Warehouse), not
+			# in source_warehouse (M/F) or target_warehouse (P/C output) -
+			# those track the actual production flow, this tracks where the
+			# consumable itself physically sits.
+			gas_key = (log.gas_item, log.consumables_warehouse)
 			gas_totals[gas_key] = gas_totals.get(gas_key, 0) + flt(log.calculated_gas_consumption)
 
 		pieces_total += flt(log.pieces)
@@ -198,7 +200,7 @@ def _build_item_stock_entry(doc, item, cut_length, logs):
 			"item_code": paint_item,
 			"qty": paint_total,
 			"uom": "Kg",
-			"s_warehouse": target_warehouse,
+			"s_warehouse": consumables_warehouse,
 		})
 
 	# No manual rate here - Manufacture type auto-costs the finished item

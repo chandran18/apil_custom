@@ -31,6 +31,7 @@
   "source_warehouse",
   "column_break_4",
   "target_warehouse",
+  "consumables_warehouse",
   "bom",
   "stock_entry",
   "included_in_shift_log",
@@ -182,10 +183,18 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "Finished Goods - Ap",
+   "default": "Powder Coating - Ap",
    "fieldname": "target_warehouse",
    "fieldtype": "Link",
    "label": "P/C Output Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "default": "Stores - Ap",
+   "description": "Where Gas and Paint/Powder actually sit in stock - separate from the P/C Output Warehouse, since those are consumables kept in Stores, not part of the finished-goods flow.",
+   "fieldname": "consumables_warehouse",
+   "fieldtype": "Link",
+   "label": "Gas/Paint Warehouse",
    "options": "Warehouse"
   },
   {
