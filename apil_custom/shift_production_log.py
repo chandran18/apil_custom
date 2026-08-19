@@ -267,20 +267,17 @@ def _build_item_stock_entry(doc, sec_no, cut_length, logs, scrap_share):
 	})
 
 	if scrap_share and scrap_share > 0:
-		scrap_rate = 250
+		# No rate here - dross/scrap has no established value at the time
+		# of manufacture (it's only worth something when actually sold,
+		# at whatever the market pays then). Leave rate/amount at 0 rather
+		# than asserting a made-up figure; whoever sells the scrap fills
+		# in the real rate on that transaction.
 		se.append("items", {
 			"item_code": doc.scrap_item,
 			"qty": scrap_share,
 			"uom": "Kg",
 			"t_warehouse": doc.scrap_warehouse,
 			"is_scrap_item": 1,
-			"basic_rate": scrap_rate,
-			# set_basic_rate_manually=1 makes ERPNext skip computing
-			# basic_amount for this row entirely (it assumes a human fills
-			# in both rate and amount via the UI) - since nothing else sets
-			# it for us here, we compute it ourselves or it silently stays 0.
-			"basic_amount": scrap_share * scrap_rate,
-			"set_basic_rate_manually": 1,
 		})
 
 	return se
